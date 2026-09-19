@@ -1,0 +1,716 @@
+// 5 kHz SOGI/PLL + 40 kHz phase-delivery diagnostic model
+// Derived from the existing pll_lock_test.va observation model and the
+// current 5k/40k reference candidate.  This file is intended for SIMetrix
+// feasibility/debug use; it does NOT replace active MCU firmware.
+//
+// Architecture:
+//   40 kHz analog/grid sampling
+//       -> /8
+//   5 kHz SOGI + PLL
+//       -> 5 kHz phase anchor
+//       -> 8 x 40 kHz interpolated phase delivery
+//
+// Important:
+// - NCO_FIXED_60HZ_TEST=1 disables the PLL correction and keeps the NCO
+//   at nominal 60 Hz for open-loop timebase/phase testing.
+// - All outputs are observation-only analog nodes.
+// - The original pll_lock_test.va should be kept unchanged.
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module pll_lock_test_5k40k_pi_fix(
+    v_grid_in,
+    v_input_dbg,
+    v_sogi_alpha,
+    v_sogi_beta,
+    v_vq_dbg,
+    v_phase_error,
+    v_err_slow_dbg,
+    v_freq_dbg,
+    v_pll_step_dbg,
+    v_phase_anchor_5k_dbg,
+    v_theta_40k_dbg,
+    v_pll_sin_40k,
+    v_phase_diff_deg_dbg,
+    v_grid_freq_meas_dbg,
+    v_phase_ok,
+    v_locked,
+    v_input_valid_dbg,
+    v_pll_update_dbg,
+    v_substep_dbg,
+    v_pi_enabled_dbg,
+    v_integral_dbg,
+    v_w_delta_dbg,
+    v_detector_phase_diff_dbg,
+    v_anchor_residual_dbg,
+    v_theta40_actual_step_dbg,
+    v_step40_expected_dbg,
+    v_fraction_acc_dbg,
+    v_applied_step_dbg
+);
+
+    input v_grid_in;
+    electrical v_grid_in;
+
+    output v_input_dbg, v_sogi_alpha, v_sogi_beta, v_vq_dbg;
+    output v_phase_error, v_err_slow_dbg, v_freq_dbg, v_pll_step_dbg;
+    output v_phase_anchor_5k_dbg, v_theta_40k_dbg, v_pll_sin_40k;
+    output v_phase_diff_deg_dbg, v_grid_freq_meas_dbg;
+    output v_phase_ok, v_locked, v_input_valid_dbg, v_pll_update_dbg;
+    output v_substep_dbg, v_pi_enabled_dbg, v_integral_dbg, v_w_delta_dbg;
+    output v_detector_phase_diff_dbg;
+    output v_anchor_residual_dbg, v_theta40_actual_step_dbg, v_step40_expected_dbg;
+    output v_fraction_acc_dbg, v_applied_step_dbg;
+
+    electrical v_input_dbg, v_sogi_alpha, v_sogi_beta, v_vq_dbg;
+    electrical v_phase_error, v_err_slow_dbg, v_freq_dbg, v_pll_step_dbg;
+    electrical v_phase_anchor_5k_dbg, v_theta_40k_dbg, v_pll_sin_40k;
+    electrical v_phase_diff_deg_dbg, v_grid_freq_meas_dbg;
+    electrical v_phase_ok, v_locked, v_input_valid_dbg, v_pll_update_dbg;
+    electrical v_substep_dbg, v_pi_enabled_dbg, v_integral_dbg, v_w_delta_dbg;
+    electrical v_detector_phase_diff_dbg;
+    electrical v_anchor_residual_dbg, v_theta40_actual_step_dbg, v_step40_expected_dbg;
+    electrical v_fraction_acc_dbg, v_applied_step_dbg;
+
+    // ---------------------------------------------------------------------
+    // Timing
+    // ---------------------------------------------------------------------
+    parameter real FS_ADC = 40000.0;
+    parameter real FS_PLL = 5000.0;
+    parameter integer DECIM_N = 8;
+    parameter real PI = 3.14159265358979323846;
+
+    // ---------------------------------------------------------------------
+    // Input/debug
+    // v_grid_in is expected as a centered analog waveform (e.g. +/-1 V).
+    // Internally we use 1000 counts/V solely for this diagnostic model.
+    // ---------------------------------------------------------------------
+    parameter real INPUT_FREQUENCY_HZ = 60.0;
+    parameter real INPUT_COUNTS_PER_V = 1000.0;
+    parameter real VMAG_MIN = 100.0;
+    parameter real ERR_LIMIT = 1000.0;
+
+    // ---------------------------------------------------------------------
+    // 5 kHz 60 Hz SOGI coefficients from pll_reference_5k40k.c
+    // Q30 coefficients converted to real.
+    // ---------------------------------------------------------------------
+    parameter real A1  = -2033145701.0 / 1073741824.0;
+    parameter real A2  =   965191209.0 / 1073741824.0;
+    parameter real B0  =    54275307.0 / 1073741824.0;
+    parameter real QB0 =     2046131.0 / 1073741824.0;
+    parameter real QB1 =     4092262.0 / 1073741824.0;
+    parameter real QB2 =     2046131.0 / 1073741824.0;
+
+    // ---------------------------------------------------------------------
+    // Current 5k candidate PLL semantics
+    // pll_step_q is "degrees per 5 kHz update" in Q21 physical scale:
+    //   degrees = pll_step_q / 2^21
+    // nominal 60 Hz step = 4.32 deg = 9059696.64 Q21.
+    // ---------------------------------------------------------------------
+    parameter real Q21 = 2097152.0;
+    parameter real PLL_WNOM_STEP_Q = 60.0 * 360.0 * Q21 / FS_PLL;
+    parameter real PLL_WMIN_STEP_Q =
+        45.0 * 360.0 * Q21 / FS_PLL;
+    parameter real PLL_WMAX_STEP_Q =
+        75.0 * 360.0 * Q21 / FS_PLL;
+    parameter real PLL_STEP_SLEW_Q =
+        100.0 * 360.0 * Q21 / (FS_PLL * FS_PLL);
+    parameter real PLL_FREQ_DEADBAND_Q =
+        0.1 * 360.0 * Q21 / FS_PLL;
+    parameter real PLL_TRIM_LIMIT_Q =
+        15.0 * 360.0 * Q21 / FS_PLL;
+    parameter real PLL_INT_LIMIT =
+        30.0 * 360.0 * Q21 / FS_PLL;
+
+    parameter real PHASE_COMP_DEG = 4.0;
+
+    parameter real PLL_LOCK_ERR_TH = 80.0;
+    parameter real PLL_LOCK_ON_ERR_TH = 170.0;
+    parameter real PLL_LOCK_OFF_ERR_TH = 300.0;
+    parameter real PLL_PI_DEADBAND_LOCK = 5.0;
+
+    parameter integer NCO_FIXED_60HZ_TEST = 0;
+    parameter integer PLL_VALID_BYPASS_TEST = 1;
+
+    // PI is intentionally held off while the 5 kHz SOGI settles.
+    // 100 samples / 5 kHz = 20 ms.
+    parameter integer PI_WARMUP_5K_SAMPLES = 100;
+
+    // ---------------------------------------------------------------------
+    // SOGI states
+    // ---------------------------------------------------------------------
+    real vin_n1, vin_n2;
+    real va_n1, va_n2;
+    real vb_n1, vb_n2;
+    real va_new, vb_new;
+    real vin_count;
+
+    // ---------------------------------------------------------------------
+    // PLL states
+    // ---------------------------------------------------------------------
+    real theta_5k_deg;
+    real phase_anchor_5k_deg;
+    real theta_40k_deg;
+    real step_5k_deg;
+    real step_40k_deg;
+
+    real vq, vmag, raw_err;
+    real err_lpf;
+    real slow_lpf_q8, slow_err;
+    real pll_int_acc;
+    real pll_step_q;
+    real pll_step_target_q;
+    real pll_step_diff_q;
+    real w_delta_q;
+    real pll_err_pi;
+    real base_step_q, step_fraction, fraction_acc, applied_step_q;
+
+    integer adc_sample_count;
+    integer substep;
+    integer phase_ok;
+    integer pll_locked;
+    integer input_valid;
+    integer pll_update_pulse;
+    integer pi_enabled;
+    integer pi_warmup_count;
+
+    // ---------------------------------------------------------------------
+    // Grid/PLL zero-crossing measurement
+    // ---------------------------------------------------------------------
+    real prev_grid_sample, prev_pll_sample;
+    real t_grid_zc_prev, t_grid_zc_now, t_pll_zc_now;
+    real grid_period_meas, grid_freq_meas;
+    real crossing_fraction, crossing_time, pair_dt;
+    real phase_dt, phase_diff_deg;
+    integer have_grid_zc, have_grid_period, have_pll_zc;
+    real detector_sample, prev_detector_sample, prev_detector_sample_time;
+    real detector_crossing_fraction, t_detector_zc_now;
+    real detector_pair_dt, detector_phase_diff_deg;
+    integer have_detector_sample;
+    real debug_previous_anchor_deg, debug_previous_step40_deg;
+    real debug_expected_next_anchor_deg, debug_anchor_residual_deg;
+    real debug_previous_theta40_deg, debug_actual_step40_deg;
+    integer debug_have_previous_anchor, debug_have_previous_theta40;
+
+    // ---------------------------------------------------------------------
+    // Analog debug voltages
+    // ---------------------------------------------------------------------
+    real input_dbg_voltage;
+    real alpha_dbg_voltage, beta_dbg_voltage, vq_dbg_voltage;
+    real phase_error_voltage, err_slow_voltage;
+    real freq_dbg_voltage, pll_step_dbg_voltage;
+    real anchor_dbg_voltage, theta40_dbg_voltage, pll_sin40_voltage;
+    real phase_diff_voltage, grid_freq_voltage;
+    real phase_ok_voltage, locked_voltage, input_valid_voltage;
+    real pll_update_voltage, substep_voltage;
+    real pi_enabled_voltage, integral_dbg_voltage, w_delta_dbg_voltage;
+    real detector_phase_diff_voltage;
+    real anchor_residual_dbg_voltage, actual_step40_dbg_voltage;
+    real expected_step40_dbg_voltage;
+
+    analog begin
+        @(initial_step) begin
+            vin_n1 = 0.0; vin_n2 = 0.0;
+            va_n1 = 0.0; va_n2 = 0.0;
+            vb_n1 = 0.0; vb_n2 = 0.0;
+            va_new = 0.0; vb_new = 0.0;
+            vin_count = 0.0;
+
+            theta_5k_deg = 0.0;
+            phase_anchor_5k_deg = 0.0;
+            theta_40k_deg = 0.0;
+            pll_step_q = PLL_WNOM_STEP_Q;
+            pll_step_target_q = PLL_WNOM_STEP_Q;
+            base_step_q = floor(pll_step_q);
+            step_fraction = 0.0;
+            fraction_acc = 0.0;
+            applied_step_q = base_step_q;
+            step_5k_deg = applied_step_q / Q21;
+            step_40k_deg = step_5k_deg / 8.0;
+
+            vq = 0.0; vmag = VMAG_MIN;
+            raw_err = 0.0; err_lpf = 0.0;
+            slow_lpf_q8 = 0.0; slow_err = 0.0;
+            pll_int_acc = 0.0;
+            pll_step_diff_q = 0.0;
+            w_delta_q = 0.0; pll_err_pi = 0.0;
+
+            adc_sample_count = 0;
+            substep = 0;
+            phase_ok = 0;
+            pll_locked = 0;
+            input_valid = (PLL_VALID_BYPASS_TEST != 0) ? 1 : 0;
+            pll_update_pulse = 0;
+            pi_enabled = 0;
+            pi_warmup_count = 0;
+
+            prev_grid_sample = 0.0;
+            prev_pll_sample = 0.0;
+            t_grid_zc_prev = 0.0;
+            t_grid_zc_now = 0.0;
+            t_pll_zc_now = 0.0;
+            grid_period_meas = 1.0 / INPUT_FREQUENCY_HZ;
+            grid_freq_meas = INPUT_FREQUENCY_HZ;
+            crossing_fraction = 0.0;
+            crossing_time = 0.0;
+            pair_dt = 0.0;
+            phase_dt = 0.0;
+            phase_diff_deg = 0.0;
+            have_grid_zc = 0;
+            have_grid_period = 0;
+            have_pll_zc = 0;
+            detector_sample = 0.0;
+            prev_detector_sample = 0.0;
+            prev_detector_sample_time = 0.0;
+            detector_crossing_fraction = 0.0;
+            t_detector_zc_now = 0.0;
+            detector_pair_dt = 0.0;
+            detector_phase_diff_deg = 0.0;
+            have_detector_sample = 0;
+            debug_previous_anchor_deg = 0.0;
+            debug_previous_step40_deg = 0.0;
+            debug_expected_next_anchor_deg = 0.0;
+            debug_anchor_residual_deg = 0.0;
+            debug_previous_theta40_deg = 0.0;
+            debug_actual_step40_deg = 0.0;
+            debug_have_previous_anchor = 0;
+            debug_have_previous_theta40 = 0;
+
+            input_dbg_voltage = 0.0;
+            alpha_dbg_voltage = 0.0;
+            beta_dbg_voltage = 0.0;
+            vq_dbg_voltage = 0.0;
+            phase_error_voltage = 0.0;
+            err_slow_voltage = 0.0;
+            freq_dbg_voltage = 6.0;
+            pll_step_dbg_voltage = PLL_WNOM_STEP_Q / 1.0e6;
+            anchor_dbg_voltage = 0.0;
+            theta40_dbg_voltage = 0.0;
+            pll_sin40_voltage = 0.0;
+            phase_diff_voltage = 0.0;
+            grid_freq_voltage = INPUT_FREQUENCY_HZ / 10.0;
+            phase_ok_voltage = 0.0;
+            locked_voltage = 0.0;
+            input_valid_voltage = input_valid ? 5.0 : 0.0;
+            pll_update_voltage = 0.0;
+            substep_voltage = 0.0;
+            pi_enabled_voltage = 0.0;
+            integral_dbg_voltage = 0.0;
+            w_delta_dbg_voltage = 0.0;
+            detector_phase_diff_voltage = 0.0;
+            anchor_residual_dbg_voltage = 0.0;
+            actual_step40_dbg_voltage = 0.0;
+            expected_step40_dbg_voltage = step_40k_deg * 10.0;
+        end
+
+        // -----------------------------------------------------------------
+        // 40 kHz domain
+        // -----------------------------------------------------------------
+        @(timer(1.0 / FS_ADC, 1.0 / FS_ADC)) begin
+            pll_update_pulse = 0;
+
+            vin_count = V(v_grid_in) * INPUT_COUNTS_PER_V;
+            input_dbg_voltage = V(v_grid_in);
+
+            // 40 kHz interpolated grid positive zero crossing
+            if ((prev_grid_sample < 0.0) && (vin_count >= 0.0)) begin
+                crossing_fraction =
+                    -prev_grid_sample / (vin_count - prev_grid_sample);
+                crossing_time =
+                    $abstime - 1.0 / FS_ADC +
+                    crossing_fraction / FS_ADC;
+
+                if (have_grid_zc) begin
+                    t_grid_zc_prev = t_grid_zc_now;
+                    t_grid_zc_now = crossing_time;
+                    grid_period_meas = t_grid_zc_now - t_grid_zc_prev;
+                    if (grid_period_meas > 0.0) begin
+                        grid_freq_meas = 1.0 / grid_period_meas;
+                        have_grid_period = 1;
+                    end
+                end else begin
+                    t_grid_zc_now = crossing_time;
+                    have_grid_zc = 1;
+                end
+            end
+            prev_grid_sample = vin_count;
+
+            adc_sample_count = adc_sample_count + 1;
+
+            // -------------------------------------------------------------
+            // Every eighth 40 kHz sample -> one 5 kHz PLL update.
+            // -------------------------------------------------------------
+            if ((adc_sample_count % DECIM_N) == 0) begin
+                pll_update_pulse = 1;
+                input_valid = (PLL_VALID_BYPASS_TEST != 0) ? 1 : input_valid;
+
+                // 5 kHz SOGI
+                va_new =
+                    B0 * (vin_count - vin_n2)
+                    - A1 * va_n1
+                    - A2 * va_n2;
+
+                vb_new =
+                    QB0 * vin_count
+                    + QB1 * vin_n1
+                    + QB2 * vin_n2
+                    - A1 * vb_n1
+                    - A2 * vb_n2;
+
+                vin_n2 = vin_n1; vin_n1 = vin_count;
+                va_n2 = va_n1; va_n1 = va_new;
+                vb_n2 = vb_n1; vb_n1 = vb_new;
+
+                // Park detector using the current 5 kHz phase state.
+                detector_sample =
+                    sin((theta_5k_deg + PHASE_COMP_DEG) * PI / 180.0);
+                if (have_detector_sample &&
+                    (prev_detector_sample < 0.0) && (detector_sample >= 0.0)) begin
+                    detector_crossing_fraction =
+                        -prev_detector_sample /
+                        (detector_sample - prev_detector_sample);
+                    t_detector_zc_now =
+                        prev_detector_sample_time +
+                        detector_crossing_fraction *
+                        ($abstime - prev_detector_sample_time);
+
+                    if (have_grid_period && have_grid_zc) begin
+                        detector_pair_dt = t_detector_zc_now - t_grid_zc_now;
+                        while (detector_pair_dt >= 0.5 * grid_period_meas)
+                            detector_pair_dt = detector_pair_dt - grid_period_meas;
+                        while (detector_pair_dt < -0.5 * grid_period_meas)
+                            detector_pair_dt = detector_pair_dt + grid_period_meas;
+                        detector_phase_diff_deg =
+                            360.0 * detector_pair_dt / grid_period_meas;
+                    end
+                end
+                prev_detector_sample = detector_sample;
+                prev_detector_sample_time = $abstime;
+                have_detector_sample = 1;
+
+                vq =
+                    va_new * cos((theta_5k_deg + PHASE_COMP_DEG) * PI / 180.0)
+                    + vb_new * sin((theta_5k_deg + PHASE_COMP_DEG) * PI / 180.0);
+
+                vmag =
+                    (((va_new >= 0.0) ? va_new : -va_new) >=
+                     ((vb_new >= 0.0) ? vb_new : -vb_new))
+                    ? ((va_new >= 0.0) ? va_new : -va_new)
+                      + 0.5 * ((vb_new >= 0.0) ? vb_new : -vb_new)
+                    : ((vb_new >= 0.0) ? vb_new : -vb_new)
+                      + 0.5 * ((va_new >= 0.0) ? va_new : -va_new);
+
+                if (vmag < VMAG_MIN) vmag = VMAG_MIN;
+
+                raw_err = vq / vmag * 1000.0;
+                if (raw_err > ERR_LIMIT) raw_err = ERR_LIMIT;
+                else if (raw_err < -ERR_LIMIT) raw_err = -ERR_LIMIT;
+
+                // Same LPF structure as the 5k reference candidate.
+                err_lpf = err_lpf + (raw_err - err_lpf) / 64.0;
+                slow_lpf_q8 =
+                    slow_lpf_q8 +
+                    ((err_lpf * 256.0) - slow_lpf_q8) / 32.0;
+                slow_err = slow_lpf_q8 / 256.0;
+
+                // ---------------------------------------------------------
+                // PI / frequency correction.
+                //
+                // Key fix versus the first feasibility version:
+                // do NOT integrate the large startup SOGI transient.
+                // Hold the NCO at nominal 60 Hz for a short SOGI warm-up,
+                // then zero the PI history and enable correction.
+                // ---------------------------------------------------------
+                if (NCO_FIXED_60HZ_TEST != 0) begin
+                    // Open-loop diagnostic mode.
+                    pi_enabled = 0;
+                    pi_warmup_count = 0;
+                    pll_int_acc = 0.0;
+                    w_delta_q = 0.0;
+                    pll_step_target_q = PLL_WNOM_STEP_Q;
+
+                end else if (!pi_enabled) begin
+                    // Closed-loop warm-up: let SOGI settle without winding PI.
+                    pll_int_acc = 0.0;
+                    w_delta_q = 0.0;
+                    pll_step_target_q = PLL_WNOM_STEP_Q;
+
+                    if (pi_warmup_count < PI_WARMUP_5K_SAMPLES)
+                        pi_warmup_count = pi_warmup_count + 1;
+
+                    if (pi_warmup_count >= PI_WARMUP_5K_SAMPLES) begin
+                        // Start the controller from the current steady detector
+                        // state instead of carrying startup history.
+                        err_lpf = raw_err;
+                        slow_lpf_q8 = raw_err * 256.0;
+                        slow_err = raw_err;
+                        pll_int_acc = 0.0;
+                        pll_step_q = PLL_WNOM_STEP_Q;
+                        pll_step_target_q = PLL_WNOM_STEP_Q;
+                        pi_enabled = 1;
+                    end
+
+                end else begin
+                    pll_err_pi = err_lpf;
+
+                    // Candidate deadband in the near-lock region.
+                    if ((((err_lpf >= 0.0) ? err_lpf : -err_lpf)
+                         <= PLL_LOCK_ERR_TH) &&
+                        (pll_err_pi <= PLL_PI_DEADBAND_LOCK) &&
+                        (pll_err_pi >= -PLL_PI_DEADBAND_LOCK))
+                        pll_err_pi = 0.0;
+
+                    // Integrator only updates when the PI error is outside
+                    // the deadband. This avoids re-introducing tiny bias
+                    // once 60 Hz phase error is already essentially zero.
+                    if (pll_err_pi != 0.0) begin
+                        pll_int_acc = pll_int_acc + pll_err_pi;
+                        if (pll_int_acc > PLL_INT_LIMIT)
+                            pll_int_acc = PLL_INT_LIMIT;
+                        else if (pll_int_acc < -PLL_INT_LIMIT)
+                            pll_int_acc = -PLL_INT_LIMIT;
+                    end
+
+                    // Same shift-equivalent gain regions as the C candidate.
+                    if ((pll_locked == 0) &&
+                        (((err_lpf >= 0.0) ? err_lpf : -err_lpf)
+                         > PLL_LOCK_ERR_TH)) begin
+                        // FAST:
+                        // (err*4096)>>2 + (int*4096)>>13
+                        w_delta_q =
+                            pll_err_pi * 1024.0
+                            + pll_int_acc * 0.5;
+                    end else begin
+                        // LOCK:
+                        // (err*4096)>>5 + (int*4096)>>15
+                        w_delta_q =
+                            pll_err_pi * 128.0
+                            + pll_int_acc * 0.125;
+                    end
+
+                    if (w_delta_q > PLL_TRIM_LIMIT_Q)
+                        w_delta_q = PLL_TRIM_LIMIT_Q;
+                    else if (w_delta_q < -PLL_TRIM_LIMIT_Q)
+                        w_delta_q = -PLL_TRIM_LIMIT_Q;
+
+                    pll_step_target_q = PLL_WNOM_STEP_Q + w_delta_q;
+                    if (pll_step_target_q > PLL_WMAX_STEP_Q)
+                        pll_step_target_q = PLL_WMAX_STEP_Q;
+                    else if (pll_step_target_q < PLL_WMIN_STEP_Q)
+                        pll_step_target_q = PLL_WMIN_STEP_Q;
+                end
+
+                pll_step_diff_q = pll_step_target_q - pll_step_q;
+                if ((pll_step_diff_q <= PLL_FREQ_DEADBAND_Q) &&
+                    (pll_step_diff_q >= -PLL_FREQ_DEADBAND_Q))
+                    pll_step_diff_q = 0.0;
+
+                if (pll_step_diff_q > PLL_STEP_SLEW_Q)
+                    pll_step_diff_q = PLL_STEP_SLEW_Q;
+                else if (pll_step_diff_q < -PLL_STEP_SLEW_Q)
+                    pll_step_diff_q = -PLL_STEP_SLEW_Q;
+
+                pll_step_q = pll_step_q + pll_step_diff_q;
+
+                base_step_q = floor(pll_step_q);
+                step_fraction = pll_step_q - base_step_q;
+                fraction_acc = fraction_acc + step_fraction;
+                applied_step_q = base_step_q;
+                if (fraction_acc >= 1.0) begin
+                    applied_step_q = base_step_q + 1.0;
+                    fraction_acc = fraction_acc - 1.0;
+                end
+
+                // 5 kHz NCO advance.
+                step_5k_deg = applied_step_q / Q21;
+                theta_5k_deg = theta_5k_deg + step_5k_deg;
+                while (theta_5k_deg >= 360.0)
+                    theta_5k_deg = theta_5k_deg - 360.0;
+                while (theta_5k_deg < 0.0)
+                    theta_5k_deg = theta_5k_deg + 360.0;
+
+                // Current reference-candidate delivery semantics:
+                // fresh post-update 5k phase becomes tick-0 anchor.
+                phase_anchor_5k_deg = theta_5k_deg;
+                step_40k_deg = step_5k_deg / 8.0;
+                substep = 0;
+                theta_40k_deg = phase_anchor_5k_deg;
+
+                if (debug_have_previous_anchor) begin
+                    debug_expected_next_anchor_deg =
+                        debug_previous_anchor_deg + 8.0 * debug_previous_step40_deg;
+                    while (debug_expected_next_anchor_deg >= 360.0)
+                        debug_expected_next_anchor_deg = debug_expected_next_anchor_deg - 360.0;
+                    while (debug_expected_next_anchor_deg < 0.0)
+                        debug_expected_next_anchor_deg = debug_expected_next_anchor_deg + 360.0;
+                    debug_anchor_residual_deg =
+                        phase_anchor_5k_deg - debug_expected_next_anchor_deg;
+                    while (debug_anchor_residual_deg >= 180.0)
+                        debug_anchor_residual_deg = debug_anchor_residual_deg - 360.0;
+                    while (debug_anchor_residual_deg < -180.0)
+                        debug_anchor_residual_deg = debug_anchor_residual_deg + 360.0;
+                end
+                debug_previous_anchor_deg = phase_anchor_5k_deg;
+                debug_previous_step40_deg = step_40k_deg;
+                debug_have_previous_anchor = 1;
+
+                // Simple lock flags for feasibility visualization.
+                // Do not declare closed-loop lock before PI warm-up finishes.
+                if ((NCO_FIXED_60HZ_TEST != 0) || pi_enabled) begin
+                    if (((err_lpf >= 0.0) ? err_lpf : -err_lpf)
+                        <= PLL_LOCK_ON_ERR_TH)
+                        pll_locked = 1;
+                    else if (((err_lpf >= 0.0) ? err_lpf : -err_lpf)
+                             > PLL_LOCK_OFF_ERR_TH)
+                        pll_locked = 0;
+
+                    if (((slow_err >= 0.0) ? slow_err : -slow_err) <= 25.0)
+                        phase_ok = 1;
+                    else if (((slow_err >= 0.0) ? slow_err : -slow_err) > 45.0)
+                        phase_ok = 0;
+                end else begin
+                    pll_locked = 0;
+                    phase_ok = 0;
+                end
+
+            end else begin
+                // Intermediate 40 kHz delivery ticks.
+                if (substep < 7)
+                    substep = substep + 1;
+
+                theta_40k_deg =
+                    phase_anchor_5k_deg +
+                    substep * step_40k_deg;
+
+                while (theta_40k_deg >= 360.0)
+                    theta_40k_deg = theta_40k_deg - 360.0;
+                while (theta_40k_deg < 0.0)
+                    theta_40k_deg = theta_40k_deg + 360.0;
+            end
+
+            if (debug_have_previous_theta40) begin
+                debug_actual_step40_deg = theta_40k_deg - debug_previous_theta40_deg;
+                while (debug_actual_step40_deg >= 180.0)
+                    debug_actual_step40_deg = debug_actual_step40_deg - 360.0;
+                while (debug_actual_step40_deg < -180.0)
+                    debug_actual_step40_deg = debug_actual_step40_deg + 360.0;
+            end
+            debug_previous_theta40_deg = theta_40k_deg;
+            debug_have_previous_theta40 = 1;
+
+            // -------------------------------------------------------------
+            // 40 kHz PLL-output zero-crossing measurement using delivered
+            // theta_40k, not the held 5 kHz phase.
+            // -------------------------------------------------------------
+            if ((prev_pll_sample < 0.0) &&
+                (sin(theta_40k_deg * PI / 180.0) >= 0.0)) begin
+
+                crossing_fraction =
+                    -prev_pll_sample /
+                    (sin(theta_40k_deg * PI / 180.0) - prev_pll_sample);
+
+                t_pll_zc_now =
+                    $abstime - 1.0 / FS_ADC +
+                    crossing_fraction / FS_ADC;
+
+                have_pll_zc = 1;
+
+                if (have_grid_period && have_grid_zc) begin
+                    pair_dt = t_pll_zc_now - t_grid_zc_now;
+
+                    while (pair_dt >= 0.5 * grid_period_meas)
+                        pair_dt = pair_dt - grid_period_meas;
+                    while (pair_dt < -0.5 * grid_period_meas)
+                        pair_dt = pair_dt + grid_period_meas;
+
+                    phase_dt = pair_dt;
+                    phase_diff_deg =
+                        360.0 * phase_dt / grid_period_meas;
+                end
+            end
+
+            prev_pll_sample =
+                sin(theta_40k_deg * PI / 180.0);
+
+            // -------------------------------------------------------------
+            // Debug scaling
+            // -------------------------------------------------------------
+            alpha_dbg_voltage = va_new / 1000.0;
+            beta_dbg_voltage = vb_new / 1000.0;
+            vq_dbg_voltage = vq / 1000.0;
+            phase_error_voltage = err_lpf / 1000.0;
+            err_slow_voltage = slow_err / 1000.0;
+
+            // 6 V = 60 Hz
+            freq_dbg_voltage =
+                ((pll_step_q / Q21) * FS_PLL / 360.0) / 10.0;
+
+            // Approx. 9.059696 V at nominal, easy to read raw step trend.
+            pll_step_dbg_voltage = pll_step_q / 1.0e6;
+
+            // 0..360 deg -> 0..3.6 V
+            anchor_dbg_voltage = phase_anchor_5k_deg * 0.01;
+            theta40_dbg_voltage = theta_40k_deg * 0.01;
+
+            pll_sin40_voltage =
+                sin(theta_40k_deg * PI / 180.0);
+
+            // 10 mV/deg
+            phase_diff_voltage = phase_diff_deg * 0.010;
+            detector_phase_diff_voltage = detector_phase_diff_deg * 0.010;
+            anchor_residual_dbg_voltage = debug_anchor_residual_deg * 100.0;
+            actual_step40_dbg_voltage = debug_actual_step40_deg * 10.0;
+            expected_step40_dbg_voltage = step_40k_deg * 10.0;
+
+            // 6 V = 60 Hz
+            grid_freq_voltage = grid_freq_meas / 10.0;
+
+            phase_ok_voltage = phase_ok ? 5.0 : 0.0;
+            locked_voltage = pll_locked ? 5.0 : 0.0;
+            input_valid_voltage = input_valid ? 5.0 : 0.0;
+            pll_update_voltage = pll_update_pulse ? 5.0 : 0.0;
+
+            // 0..7 -> 0..3.5 V
+            substep_voltage = substep * 0.5;
+
+            // PI-specific observation signals
+            pi_enabled_voltage = pi_enabled ? 5.0 : 0.0;
+            // Scale large internal values into readable voltages.
+            integral_dbg_voltage = pll_int_acc / 10000.0;
+            w_delta_dbg_voltage = w_delta_q / 100000.0;
+        end
+
+        // -----------------------------------------------------------------
+        // Observation-only outputs
+        // -----------------------------------------------------------------
+        V(v_input_dbg) <+ input_dbg_voltage;
+        V(v_sogi_alpha) <+ transition(alpha_dbg_voltage, 0.0, 100n, 100n);
+        V(v_sogi_beta) <+ transition(beta_dbg_voltage, 0.0, 100n, 100n);
+        V(v_vq_dbg) <+ transition(vq_dbg_voltage, 0.0, 100n, 100n);
+        V(v_phase_error) <+ transition(phase_error_voltage, 0.0, 100n, 100n);
+        V(v_err_slow_dbg) <+ transition(err_slow_voltage, 0.0, 100n, 100n);
+        V(v_freq_dbg) <+ transition(freq_dbg_voltage, 0.0, 100n, 100n);
+        V(v_pll_step_dbg) <+ transition(pll_step_dbg_voltage, 0.0, 100n, 100n);
+        V(v_phase_anchor_5k_dbg) <+ transition(anchor_dbg_voltage, 0.0, 100n, 100n);
+        V(v_theta_40k_dbg) <+ transition(theta40_dbg_voltage, 0.0, 100n, 100n);
+        V(v_pll_sin_40k) <+ transition(pll_sin40_voltage, 0.0, 100n, 100n);
+        V(v_phase_diff_deg_dbg) <+ transition(phase_diff_voltage, 0.0, 100n, 100n);
+        V(v_grid_freq_meas_dbg) <+ transition(grid_freq_voltage, 0.0, 100n, 100n);
+        V(v_phase_ok) <+ transition(phase_ok_voltage, 0.0, 100n, 100n);
+        V(v_locked) <+ transition(locked_voltage, 0.0, 100n, 100n);
+        V(v_input_valid_dbg) <+ transition(input_valid_voltage, 0.0, 100n, 100n);
+        V(v_pll_update_dbg) <+ transition(pll_update_voltage, 0.0, 100n, 100n);
+        V(v_substep_dbg) <+ transition(substep_voltage, 0.0, 100n, 100n);
+        V(v_pi_enabled_dbg) <+ transition(pi_enabled_voltage, 0.0, 100n, 100n);
+        V(v_integral_dbg) <+ transition(integral_dbg_voltage, 0.0, 100n, 100n);
+        V(v_w_delta_dbg) <+ transition(w_delta_dbg_voltage, 0.0, 100n, 100n);
+        V(v_detector_phase_diff_dbg) <+ transition(detector_phase_diff_voltage, 0.0, 100n, 100n);
+        V(v_anchor_residual_dbg) <+ transition(anchor_residual_dbg_voltage, 0.0, 100n, 100n);
+        V(v_theta40_actual_step_dbg) <+ transition(actual_step40_dbg_voltage, 0.0, 100n, 100n);
+        V(v_step40_expected_dbg) <+ transition(expected_step40_dbg_voltage, 0.0, 100n, 100n);
+        V(v_fraction_acc_dbg) <+ transition(fraction_acc, 0.0, 100n, 100n);
+        V(v_applied_step_dbg) <+ transition(applied_step_q / 1.0e6, 0.0, 100n, 100n);
+    end
+
+endmodule
