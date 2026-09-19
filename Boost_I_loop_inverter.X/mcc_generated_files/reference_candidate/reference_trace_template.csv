@@ -1,0 +1,4 @@
+sample_40k,sample_5k,adc_raw,adc_centered,va,vb,vq,pi,freq_correction,phase_anchor,phase_step,phase_40k,phase_ok,locked,vref,iref
+0,0,2048,0,0,0,0,0,0,0,0,0,0,0,0,0
+1,0,2048,0,0,0,0,0,0,0,0,0,0,0,0,0
+2,0,2048,0,0,0,0,0,0,0,0,0,0,0,0,0

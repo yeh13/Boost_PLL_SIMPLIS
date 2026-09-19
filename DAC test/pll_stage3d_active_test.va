@@ -1,0 +1,183 @@
+// Feasibility model for the actually compiled _ADCAN1Interrupt inline
+// Stage-3D branch. This is intentionally separate from pll_lock_test.va.
+// Input scaling: 1 Vpk at v_grid_in = 1000 centered ADC counts peak.
+// The model preserves the 40 kHz entry, /16 scheduling, 2.5 kHz state order,
+// Stage-3D validity/phase-init/fixed-normalization/PI structure, and the fact
+// that this branch never writes legacy phase_ok or pll_locked.
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module pll_stage3d_active_test(
+    v_grid_in, v_input_dbg, v_sogi_alpha, v_sogi_beta, v_pll_sin,
+    v_phase_error, v_err_fast_dbg, v_err_slow_dbg, v_freq_dbg, v_theta_dbg,
+    v_phase_ok, v_locked, v_input_valid_dbg, v_phase_initialized_dbg,
+    v_pi_enabled_dbg, v_step_delta_dbg, v_lock_count_dbg,
+    v_unlock_count_dbg, v_theta_before_dbg, v_theta_detector_dbg,
+    v_sin_theta_before_dbg, v_sin_theta_detector_dbg, v_i_ref_test_dbg);
+
+    input v_grid_in;
+    electrical v_grid_in;
+    output v_input_dbg, v_sogi_alpha, v_sogi_beta, v_pll_sin;
+    output v_phase_error, v_err_fast_dbg, v_err_slow_dbg, v_freq_dbg;
+    output v_theta_dbg, v_phase_ok, v_locked, v_input_valid_dbg;
+    output v_phase_initialized_dbg, v_pi_enabled_dbg, v_step_delta_dbg;
+    output v_lock_count_dbg, v_unlock_count_dbg;
+    output v_theta_before_dbg, v_theta_detector_dbg;
+    output v_sin_theta_before_dbg, v_sin_theta_detector_dbg;
+    output v_i_ref_test_dbg;
+    electrical v_input_dbg, v_sogi_alpha, v_sogi_beta, v_pll_sin;
+    electrical v_phase_error, v_err_fast_dbg, v_err_slow_dbg, v_freq_dbg;
+    electrical v_theta_dbg, v_phase_ok, v_locked, v_input_valid_dbg;
+    electrical v_phase_initialized_dbg, v_pi_enabled_dbg, v_step_delta_dbg;
+    electrical v_lock_count_dbg, v_unlock_count_dbg;
+    electrical v_theta_before_dbg, v_theta_detector_dbg;
+    electrical v_sin_theta_before_dbg, v_sin_theta_detector_dbg;
+    electrical v_i_ref_test_dbg;
+
+    parameter real FS_RAW = 40000.0;
+    parameter integer DECIM_N = 16;
+    parameter real FS_PLL = 2500.0;
+    parameter real INPUT_COUNTS_PER_VOLT = 1000.0;
+    parameter real PHASE_COMP_DEG = 4.0;
+    // Output/reference calibration only. Never used by the PLL detector.
+    parameter real REF_PHASE_OFFSET_DEG = 0.0;
+
+    parameter real A1  = -1919669515.0 / 1073741824.0;
+    parameter real A2  =  867878708.0 / 1073741824.0;
+    parameter real B0  =  102931558.0 / 1073741824.0;
+    parameter real QB0 =    7760857.0 / 1073741824.0;
+    parameter real QB1 =   15521713.0 / 1073741824.0;
+    parameter real QB2 =    7760857.0 / 1073741824.0;
+
+    real vin, vin1, vin2, va, va1, va2, vb, vb1, vb2;
+    real mag, theta_deg, theta_det_rad, vq, raw_err;
+    real theta_before_deg, theta_detector_deg;
+    real err_fast, err_residual, int_acc, int_increment;
+    real p_step, i_step, step_target, step_actual, step_delta;
+    real input_v, alpha_v, beta_v, pll_v, err_v, freq_v, theta_v;
+    integer raw_count, valid_count, lost_count, input_valid;
+    integer warmup_count, zc_wait_count, phase_initialized;
+    integer prev_vin_nonpositive;
+
+    analog begin
+        @(initial_step) begin
+            vin=0; vin1=0; vin2=0; va=0; va1=0; va2=0; vb=0; vb1=0; vb2=0;
+            mag=0; theta_deg=0; vq=0; raw_err=0; err_fast=0;
+            theta_before_deg=0; theta_detector_deg=PHASE_COMP_DEG;
+            err_residual=0; int_acc=0; int_increment=0;
+            step_actual=18119393.0; step_target=18119393.0; step_delta=0;
+            raw_count=0; valid_count=0; lost_count=0; input_valid=0;
+            warmup_count=0; zc_wait_count=0; phase_initialized=0;
+            prev_vin_nonpositive=1;
+            input_v=0; alpha_v=0; beta_v=0; pll_v=0; err_v=0;
+            freq_v=6.0; theta_v=0;
+        end
+
+        @(timer(1.0/FS_RAW, 1.0/FS_RAW)) begin
+            vin = V(v_grid_in) * INPUT_COUNTS_PER_VOLT;
+            input_v = vin / INPUT_COUNTS_PER_VOLT;
+            raw_count = raw_count + 1;
+
+            if ((raw_count % DECIM_N) == 0) begin
+                // Fixed 60 Hz SOGI; real arithmetic is used for portability,
+                // while the offline replay checks the firmware integer path.
+                va = B0*(vin-vin2) - A1*va1 - A2*va2;
+                vb = QB0*vin + QB1*vin1 + QB2*vin2 - A1*vb1 - A2*vb2;
+                vin2=vin1; vin1=vin; va2=va1; va1=va; vb2=vb1; vb1=vb;
+
+                mag = ((abs(va) >= abs(vb)) ? abs(va) : abs(vb)) +
+                      ((abs(va) >= abs(vb)) ? abs(vb) : abs(va))/2.0;
+                if (!input_valid) begin
+                    lost_count=0;
+                    if (mag >= 300.0) begin
+                        if (valid_count < 75) valid_count=valid_count+1;
+                        if (valid_count >= 75) input_valid=1;
+                    end else valid_count=0;
+                end else begin
+                    valid_count=75;
+                    if (mag < 200.0) begin
+                        if (lost_count < 8) lost_count=lost_count+1;
+                        if (lost_count >= 8) begin
+                            input_valid=0; valid_count=0;
+                        end
+                    end else lost_count=0;
+                end
+
+                if (!phase_initialized) begin
+                    if (warmup_count < 50) warmup_count=warmup_count+1;
+                    else if (prev_vin_nonpositive && (vin > 0.0)) begin
+                        theta_deg=356.0; // 360 - active 4 degree detector comp
+                        phase_initialized=1; int_acc=0; err_fast=0;
+                        err_residual=0; step_actual=18119393.0;
+                    end else begin
+                        if (zc_wait_count < 250) zc_wait_count=zc_wait_count+1;
+                    end
+                    prev_vin_nonpositive = (vin <= 0.0);
+                end
+
+                if (phase_initialized) begin
+                    // Firmware ordering: detector reads the pre-update NCO.
+                    theta_before_deg=theta_deg;
+                    theta_detector_deg=theta_before_deg+PHASE_COMP_DEG;
+                    while (theta_detector_deg>=360.0) theta_detector_deg=theta_detector_deg-360.0;
+                    theta_det_rad=theta_detector_deg*`M_PI/180.0;
+                    vq=va*cos(theta_det_rad)+vb*sin(theta_det_rad);
+                    // Active Stage-3D fixed Q15 normalization gain.
+                    raw_err=(vq*25326.0/32768.0);
+                    if (raw_err>1000.0) raw_err=1000.0;
+                    else if (raw_err< -1000.0) raw_err=-1000.0;
+                    err_fast=err_fast+(raw_err-err_fast)/64.0;
+
+                    // Active diagnostic integrator increment is divided by 16.
+                    int_increment=err_fast/16.0;
+                    int_acc=int_acc+int_increment;
+                    if (int_acc>837766.0) int_acc=837766.0;
+                    else if (int_acc< -837766.0) int_acc=-837766.0;
+                    p_step=err_fast*1512043944.0/1048576.0;
+                    i_step=int_acc*3023835.0/1048576.0;
+                    step_target=18119393.0+p_step+i_step;
+                    if (step_target>19629342.0) step_target=19629342.0;
+                    else if (step_target<16609443.0) step_target=16609443.0;
+                    step_delta=step_target-step_actual;
+                    if (step_delta>12079.0) step_delta=12079.0;
+                    else if (step_delta< -12079.0) step_delta=-12079.0;
+                    step_actual=step_actual+step_delta;
+                    theta_deg=theta_deg+step_actual/2097152.0;
+                    while (theta_deg>=360.0) theta_deg=theta_deg-360.0;
+                end
+
+                alpha_v=va/1000.0; beta_v=vb/1000.0;
+                pll_v=sin(theta_deg*`M_PI/180.0);
+                err_v=err_fast/1000.0;
+                freq_v=(step_actual/301989.0)/10.0;
+                theta_v=theta_deg/360.0;
+            end
+        end
+
+        V(v_input_dbg) <+ input_v;
+        V(v_sogi_alpha) <+ transition(alpha_v,0,100n,100n);
+        V(v_sogi_beta) <+ transition(beta_v,0,100n,100n);
+        V(v_pll_sin) <+ transition(pll_v,0,100n,100n);
+        V(v_phase_error) <+ transition(err_v,0,100n,100n);
+        V(v_err_fast_dbg) <+ transition(err_v,0,100n,100n);
+        // No slow LPF exists in the active inline branch.
+        V(v_err_slow_dbg) <+ 0.0;
+        V(v_freq_dbg) <+ transition(freq_v,0,100n,100n);
+        V(v_theta_dbg) <+ transition(theta_v,0,100n,100n);
+        // Active inline early-return branch never writes these legacy states.
+        V(v_phase_ok) <+ 0.0;
+        V(v_locked) <+ 0.0;
+        V(v_input_valid_dbg) <+ transition(input_valid?5.0:0.0,0,100n,100n);
+        V(v_phase_initialized_dbg) <+ transition(phase_initialized?5.0:0.0,0,100n,100n);
+        V(v_pi_enabled_dbg) <+ transition(phase_initialized?5.0:0.0,0,100n,100n);
+        V(v_step_delta_dbg) <+ step_delta/301989.0;
+        V(v_lock_count_dbg) <+ 0.0;
+        V(v_unlock_count_dbg) <+ 0.0;
+        V(v_theta_before_dbg) <+ transition(theta_before_deg/360.0,0,100n,100n);
+        V(v_theta_detector_dbg) <+ transition(theta_detector_deg/360.0,0,100n,100n);
+        V(v_sin_theta_before_dbg) <+ transition(sin(theta_before_deg*`M_PI/180.0),0,100n,100n);
+        V(v_sin_theta_detector_dbg) <+ transition(sin(theta_detector_deg*`M_PI/180.0),0,100n,100n);
+        V(v_i_ref_test_dbg) <+ transition(sin((theta_deg+REF_PHASE_OFFSET_DEG)*`M_PI/180.0),0,100n,100n);
+    end
+endmodule

@@ -1,0 +1,76 @@
+// SIMPLIS ANALOG INPUT CANDIDATE
+// ORIGINAL DIGITAL DUT REMAINS AUTHORITATIVE
+// NO PLL / SOGI / FIXED60 / PHASE-DELIVERY ALGORITHM CHANGE
+//
+// This file is a separate SIMPLIS analog frontend for the existing
+// fixed60_pll_phase40k_candidate digital controller. The original DUT is left
+// untouched and remains the authoritative implementation of the 5 kHz PLL and
+// 40 kHz phase-delivery logic.
+//
+// Design intent:
+//   electrical v_grid_in -> 40 kHz ADC equivalent -> 12-bit ac_input bus ->
+//   fixed60_pll_phase40k_candidate -> PLL / HOLD / phase40k / reference logic
+//
+// Important notes:
+//   - The analog interface is intended to match the MATLAB ADC contract.
+//   - The digital control logic is not reimplemented here.
+//   - If the local SIMPLIS environment requires a two-block structure (analog
+//     ADC block + digital controller block), this wrapper should be used only as
+//     the analog front end, while the original digital DUT remains unchanged.
+
+`include "disciplines.vams"
+
+module fixed60_pll_phase40k_simplis_analog (
+    input clk,
+    input reset,
+    electrical v_grid_in,
+    output reg [11:0] ac_input
+);
+
+    // MATLAB golden contract:
+    // adc[k] = round(2048 + 1860*sin(2*pi*60*k/40000))
+    // Therefore for the analog test:
+    // v_grid_in(t) = sin(2*pi*60*t) V
+    // adc_real = 2048.0 + 1860.0 * V(v_grid_in)
+    // adc_code = floor(adc_real + 0.5)
+    // clamp to 0 ... 4095
+    parameter real FS_ADC = 40000.0;
+    parameter real ADC_OFFSET = 2048.0;
+    parameter real ADC_GAIN = 1860.0;
+    parameter real ADC_MAX = 4095.0;
+    parameter real ADC_MIN = 0.0;
+
+    integer adc_code_i;
+    real adc_real;
+    real v_in;
+    integer sample_index;
+
+    // The original digital controller expects a clean 12-bit sample for each
+    // controller tick. This wrapper keeps the timing deterministic and aligned to
+    // the 40 kHz controller rate. The first active sample corresponds to MATLAB
+    // sample k = 0, and the first /8 PLL update occurs after samples k = 0..7.
+    analog begin
+        @(timer(0.0, 1.0 / FS_ADC)) begin
+            v_in = V(v_grid_in);
+            adc_real = ADC_OFFSET + ADC_GAIN * v_in;
+
+            // MATLAB-equivalent rounding for the normal test range.
+            // Because the signal is constrained to roughly +/-1 V in this test,
+            // adc_real remains in the positive range 188..3908. A simple
+            // round-to-nearest implementation is therefore sufficient here.
+            adc_code_i = integer(floor(adc_real + 0.5));
+
+            if (adc_code_i < ADC_MIN) adc_code_i = 0;
+            if (adc_code_i > ADC_MAX) adc_code_i = 4095;
+
+            ac_input = adc_code_i[11:0];
+            sample_index = sample_index + 1;
+        end
+    end
+
+    // Optional debug outputs can be created in the SIMPLIS schematic by wiring
+    // analog monitor nodes. These are intended only for waveform readability.
+    // The authoritative comparison remains the original digital controller output
+    // stream and the MATLAB golden CSV.
+
+endmodule

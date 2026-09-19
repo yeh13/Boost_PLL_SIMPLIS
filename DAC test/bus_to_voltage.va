@@ -1,0 +1,76 @@
+// bus_to_voltage.va
+//
+// Minimal, conservative Verilog-A wrapper for the analog-mirror feasibility
+// test. Decodes a FIXED 16-bit two's-complement digital bus (driven by a
+// VSXA logic-level output) into a single ground-referenced analog voltage.
+//
+//     Vout = signed_code * scale
+//
+// scale = 0.001 (1 LSB = 1 mV), so:
+//     code = +1000 -> Vout = +1.000 V
+//     code =  +500 -> Vout = +0.500 V
+//     code =     0 -> Vout =  0.000 V
+//     code =  -500 -> Vout = -0.500 V
+//     code = -1000 -> Vout = -1.000 V
+//
+// `vth` is the logic decision threshold applied to each bit's node voltage.
+// It must be consistent with the OUT_LOW/OUT_HIGH levels the VSXA symbol
+// is actually driving on the `code` bus (SIMetrix digital default is
+// typically 0V / 5V; adjust vth if your VSXA symbol uses different levels).
+//
+// Deliberately NOT parameterized on bit width, and NOT using a genvar/
+// analog-for loop to index the vectored node — all 16 bits are decoded
+// with explicit, individually-written statements. This is the most
+// conservative Verilog-A pattern available (plain parameters, plain
+// `if` statements, no compile-time-indexed loop construct), to minimize
+// the risk of a parser/elaboration issue unrelated to the actual
+// feasibility question being tested: whether `code` renders as a single
+// bus pin on the schematic, or forces per-bit breakout.
+//
+// The single vectored port declaration below (`electrical [15:0] code;`)
+// is what is actually being tested. If SIMPLIS 8.30's symbol generator
+// turns this into 16 separate pins, Option B does not meet the "no manual
+// bit breakout" requirement and should be reconsidered.
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module bus_to_voltage(code, vout);
+
+    input  [15:0] code;
+    electrical [15:0] code;
+
+    output vout;
+    electrical vout;
+
+    parameter real scale = 0.001;   // volts per LSB
+    parameter real vth   = 2.5;     // logic threshold, volts
+
+    integer raw;
+    real vcode;
+
+    analog begin
+        raw = 0;
+        if (V(code[0])  > vth) raw = raw + 1;
+        if (V(code[1])  > vth) raw = raw + 2;
+        if (V(code[2])  > vth) raw = raw + 4;
+        if (V(code[3])  > vth) raw = raw + 8;
+        if (V(code[4])  > vth) raw = raw + 16;
+        if (V(code[5])  > vth) raw = raw + 32;
+        if (V(code[6])  > vth) raw = raw + 64;
+        if (V(code[7])  > vth) raw = raw + 128;
+        if (V(code[8])  > vth) raw = raw + 256;
+        if (V(code[9])  > vth) raw = raw + 512;
+        if (V(code[10]) > vth) raw = raw + 1024;
+        if (V(code[11]) > vth) raw = raw + 2048;
+        if (V(code[12]) > vth) raw = raw + 4096;
+        if (V(code[13]) > vth) raw = raw + 8192;
+        if (V(code[14]) > vth) raw = raw + 16384;
+        // bit 15 is the two's-complement sign bit: worth -32768, not +32768
+        if (V(code[15]) > vth) raw = raw - 32768;
+
+        vcode = raw;
+        V(vout) <+ vcode * scale;
+    end
+
+endmodule

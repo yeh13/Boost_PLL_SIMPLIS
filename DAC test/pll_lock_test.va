@@ -1,0 +1,538 @@
+// PLL-only feasibility model for the active adc1.c SOGI/PLL path.
+// All control updates are discrete: 40 kHz input sampling, /16 = 2.5 kHz PLL.
+
+`include "constants.vams"
+`include "disciplines.vams"
+
+module pll_lock_test(v_grid_in, v_input_dbg, v_sogi_alpha, v_sogi_beta,
+                     v_pll_sin, v_phase_error, v_freq_dbg, v_locked,
+                     v_phase_ok, v_err_fast_dbg, v_err_slow_dbg,
+                     v_input_valid_dbg, v_lock_condition_dbg,
+                     v_phase_on_count_dbg, v_phase_off_count_dbg,
+                     v_lock_count_dbg, v_unlock_count_dbg, v_step_delta_dbg,
+                     v_amp_window_dbg, v_window_max_dbg, v_window_min_dbg,
+                     v_window_count_dbg, v_theta_dbg, v_pll_sin_raw_dbg,
+                     v_input_valid_original_dbg, v_input_valid_for_pll_dbg,
+                     v_phase_diff_deg_dbg, v_phase_dt_dbg, v_grid_freq_meas_dbg,
+                     v_sogi_phase_diff_dbg, v_input_alpha_phase_dbg);
+    input v_grid_in;
+    electrical v_grid_in;
+    output v_input_dbg, v_sogi_alpha, v_sogi_beta, v_pll_sin;
+    output v_phase_error, v_freq_dbg, v_locked, v_phase_ok;
+    output v_err_fast_dbg, v_err_slow_dbg, v_input_valid_dbg;
+    output v_lock_condition_dbg, v_phase_on_count_dbg, v_phase_off_count_dbg;
+    output v_lock_count_dbg, v_unlock_count_dbg, v_step_delta_dbg;
+    output v_amp_window_dbg, v_window_max_dbg, v_window_min_dbg;
+    output v_window_count_dbg, v_theta_dbg, v_pll_sin_raw_dbg;
+    output v_input_valid_original_dbg, v_input_valid_for_pll_dbg;
+    output v_phase_diff_deg_dbg, v_phase_dt_dbg, v_grid_freq_meas_dbg;
+    output v_sogi_phase_diff_dbg, v_input_alpha_phase_dbg;
+    electrical v_input_dbg, v_sogi_alpha, v_sogi_beta, v_pll_sin;
+    electrical v_phase_error, v_freq_dbg, v_locked, v_phase_ok;
+    electrical v_err_fast_dbg, v_err_slow_dbg, v_input_valid_dbg;
+    electrical v_lock_condition_dbg, v_phase_on_count_dbg, v_phase_off_count_dbg;
+    electrical v_lock_count_dbg, v_unlock_count_dbg, v_step_delta_dbg;
+    electrical v_amp_window_dbg, v_window_max_dbg, v_window_min_dbg;
+    electrical v_window_count_dbg, v_theta_dbg, v_pll_sin_raw_dbg;
+    electrical v_input_valid_original_dbg, v_input_valid_for_pll_dbg;
+    electrical v_phase_diff_deg_dbg, v_phase_dt_dbg, v_grid_freq_meas_dbg;
+    electrical v_sogi_phase_diff_dbg, v_input_alpha_phase_dbg;
+
+    parameter integer PHASE_INIT_ENABLE = 0;
+    parameter real INPUT_FREQUENCY_HZ = 60.0;
+    parameter real INPUT_AMPLITUDE_VPK = 1.0;
+
+    parameter real FS_ADC = 40000.0;
+    parameter real FS_PLL = 2500.0;
+    parameter integer DECIM_N = 16;
+    parameter real PI = 3.14159265358979323846;
+
+    parameter real A1 = -1919669515.0 / 1073741824.0;
+    parameter real A2 =  867878708.0  / 1073741824.0;
+    parameter real B0 =  102931558.0  / 1073741824.0;
+    parameter real QB0 = 7760857.0   / 1073741824.0;
+    parameter real QB1 = 15521713.0  / 1073741824.0;
+    parameter real QB2 = 7760857.0   / 1073741824.0;
+
+    parameter real PHASE_COMP_DEG = 4.0;
+    parameter real VMAG_MIN = 100.0;
+    parameter real ERR_LIMIT = 1000.0;
+    parameter real KP_HZ_PER_PU = 30.0 / (2.0 * PI);
+    parameter real KI_HZ_PER_S_PER_PU = 150.0 / (2.0 * PI);
+    parameter real INT_LIMIT_HZ = 8.0;
+
+    parameter real LOCK_FREQ_MIN = 58.0;
+    parameter real LOCK_FREQ_MAX = 62.0;
+    parameter real ACQ_SLEW_HZ_PER_S = 100.0;
+    parameter real LOCK_SLEW_HZ_PER_S = 60.0;
+    parameter real LOCK_STEP_DELTA_HZ = 0.150;
+    parameter integer DEBUG_MINIMAL_OUTPUT = 0;
+    parameter integer NCO_FIXED_60HZ_TEST = 0;
+    parameter integer PLL_VALID_BYPASS_TEST = 1;
+
+    real vin_n1, vin_n2, va_n1, va_n2, vb_n1, vb_n2;
+    real va_new, vb_new, vin_count;
+    real theta, frequency_est, frequency_target;
+    real err_lpf, slow_lpf_q8, slow_err, pi_error, integral_hz;
+    real vq, vmag, abs_va, abs_vb, maxv, minv;
+    real theta_det, sin_theta, cos_theta, e_pu;
+    real raw_err, target_delta, applied_delta, last_step_delta;
+    real amp_min, amp_max, amp_counts;
+    integer adc_sample_count, pll_update_count, amp_window_count;
+    integer phase_init_count, phase_ok_count, phase_bad_count;
+    integer lock_count, unlock_count;
+    integer candidate_index, best_index, use_input_sign, same_sign;
+    integer have_same_sign;
+    integer input_valid, input_valid_for_pll, pi_enabled, phase_initialized;
+    integer input_valid_candidate, input_valid_on_count, input_valid_off_count;
+    integer phase_ok, pll_locked, stats_reported;
+    integer have_lock_time, have_phase_ok_time;
+    integer cond_pi_enabled, cond_input_valid, cond_err, cond_freq, cond_step_delta;
+    integer lock_condition;
+    real lock_time, phase_ok_time, max_frequency_excursion;
+    real steady_error_sum;
+    real best_abs_vq, candidate_vq, candidate_theta, same_best_abs_vq;
+    integer steady_error_count;
+    real input_dbg_voltage, alpha_dbg_voltage, beta_dbg_voltage;
+    real pll_sin_voltage, phase_error_voltage, freq_dbg_voltage;
+    real locked_voltage, phase_ok_voltage;
+    real err_fast_voltage, err_slow_voltage, input_valid_voltage;
+    real input_valid_for_pll_voltage;
+    real lock_condition_voltage, phase_on_count_voltage, phase_off_count_voltage;
+    real lock_count_voltage, unlock_count_voltage, step_delta_voltage;
+    real amp_window_voltage, window_max_voltage, window_min_voltage;
+    real window_count_voltage, theta_voltage, pll_sin_raw_voltage;
+    real prev_grid_sample, prev_pll_sample, prev_alpha_sample, prev_beta_sample;
+    real t_grid_zc_prev, t_grid_zc_now, t_pll_zc_now;
+    real t_alpha_zc_now, t_beta_zc_now, grid_period_meas, grid_freq_meas;
+    real phase_dt, phase_diff_deg, sogi_phase_diff_deg, input_alpha_phase_deg;
+    real crossing_fraction, crossing_time, pair_dt;
+    real phase_diff_voltage, phase_dt_voltage, grid_freq_meas_voltage;
+    real sogi_phase_diff_voltage, input_alpha_phase_voltage;
+    integer have_grid_zc, have_grid_period, have_pll_zc, have_alpha_zc, have_beta_zc;
+
+    analog begin
+        @(initial_step) begin
+            vin_n1 = 0.0; vin_n2 = 0.0;
+            va_n1 = 0.0; va_n2 = 0.0;
+            vb_n1 = 0.0; vb_n2 = 0.0;
+            theta = 0.0;
+            frequency_est = 60.0;
+            frequency_target = 60.0;
+            err_lpf = 0.0; slow_lpf_q8 = 0.0; slow_err = 0.0;
+            integral_hz = 0.0;
+            amp_min = 0.0; amp_max = 0.0; amp_counts = 0.0;
+            adc_sample_count = 0; pll_update_count = 0;
+            amp_window_count = 0; phase_init_count = 0;
+            phase_ok_count = 0; phase_bad_count = 0;
+            lock_count = 0; unlock_count = 0;
+            input_valid = 0; input_valid_for_pll = (PLL_VALID_BYPASS_TEST != 0) ? 1 : 0;
+            pi_enabled = 0;
+            input_valid_candidate = 0; input_valid_on_count = 0; input_valid_off_count = 0;
+            phase_initialized = (PHASE_INIT_ENABLE == 0) ? 1 : 0;
+            phase_ok = 0; pll_locked = 0; stats_reported = 0;
+            cond_pi_enabled = 0; cond_input_valid = 0; cond_err = 0;
+            cond_freq = 0; cond_step_delta = 0; lock_condition = 0;
+            have_lock_time = 0; have_phase_ok_time = 0;
+            lock_time = 0.0; phase_ok_time = 0.0;
+            max_frequency_excursion = 0.0;
+            steady_error_sum = 0.0; steady_error_count = 0;
+            candidate_index = 0; best_index = 0; use_input_sign = 0; same_sign = 0;
+            input_dbg_voltage = 0.0; alpha_dbg_voltage = 0.0;
+            beta_dbg_voltage = 0.0; pll_sin_voltage = 0.0;
+            phase_error_voltage = 0.0; freq_dbg_voltage = 6.0;
+            locked_voltage = 0.0; phase_ok_voltage = 0.0;
+            va_new = 0.0; vb_new = 0.0; vin_count = 0.0;
+            vq = 0.0; vmag = 0.0; abs_va = 0.0; abs_vb = 0.0;
+            maxv = 0.0; minv = 0.0; theta_det = 0.0;
+            sin_theta = 0.0; cos_theta = 1.0; e_pu = 0.0;
+            raw_err = 0.0; target_delta = 0.0; applied_delta = 0.0;
+            last_step_delta = 0.0; best_abs_vq = 0.0;
+            candidate_vq = 0.0; candidate_theta = 0.0;
+            same_best_abs_vq = 0.0;
+            err_fast_voltage = 0.0; err_slow_voltage = 0.0;
+            input_valid_voltage = 0.0;
+            input_valid_for_pll_voltage = (PLL_VALID_BYPASS_TEST != 0) ? 5.0 : 0.0;
+            lock_condition_voltage = 0.0;
+            phase_on_count_voltage = 0.0; phase_off_count_voltage = 0.0;
+            lock_count_voltage = 0.0; unlock_count_voltage = 0.0;
+            step_delta_voltage = 0.0;
+            amp_window_voltage = 0.0; window_max_voltage = 0.0;
+            window_min_voltage = 0.0; window_count_voltage = 0.0;
+            theta_voltage = 0.0; pll_sin_raw_voltage = 0.0;
+            prev_grid_sample = 0.0; prev_pll_sample = 0.0;
+            prev_alpha_sample = 0.0; prev_beta_sample = 0.0;
+            t_grid_zc_prev = 0.0; t_grid_zc_now = 0.0; t_pll_zc_now = 0.0;
+            t_alpha_zc_now = 0.0; t_beta_zc_now = 0.0;
+            grid_period_meas = 1.0 / INPUT_FREQUENCY_HZ;
+            grid_freq_meas = INPUT_FREQUENCY_HZ;
+            phase_dt = 0.0; phase_diff_deg = 0.0;
+            sogi_phase_diff_deg = 0.0; input_alpha_phase_deg = 0.0;
+            crossing_fraction = 0.0; crossing_time = 0.0; pair_dt = 0.0;
+            phase_diff_voltage = 0.0; phase_dt_voltage = 0.0;
+            grid_freq_meas_voltage = INPUT_FREQUENCY_HZ / 10.0;
+            sogi_phase_diff_voltage = 0.0; input_alpha_phase_voltage = 0.0;
+            have_grid_zc = 0; have_grid_period = 0; have_pll_zc = 0;
+            have_alpha_zc = 0; have_beta_zc = 0;
+        end
+
+        @(timer(1.0 / FS_ADC, 1.0 / FS_ADC)) begin
+            vin_count = V(v_grid_in) * 1000.0;
+            input_dbg_voltage = vin_count / 1000.0;
+
+            // Interpolated positive-going grid zero crossing at the 40 kHz
+            // input sampling rate. All reported phase signs use positive =
+            // second signal lags the first signal.
+            if ((prev_grid_sample < 0.0) && (vin_count >= 0.0)) begin
+                crossing_fraction = -prev_grid_sample / (vin_count - prev_grid_sample);
+                crossing_time = $abstime - 1.0 / FS_ADC + crossing_fraction / FS_ADC;
+                if (have_grid_zc) begin
+                    t_grid_zc_prev = t_grid_zc_now;
+                    t_grid_zc_now = crossing_time;
+                    grid_period_meas = t_grid_zc_now - t_grid_zc_prev;
+                    if (grid_period_meas > 0.0) begin
+                        grid_freq_meas = 1.0 / grid_period_meas;
+                        have_grid_period = 1;
+                    end
+                end else begin
+                    t_grid_zc_now = crossing_time;
+                    have_grid_zc = 1;
+                end
+            end
+            prev_grid_sample = vin_count;
+
+            if (amp_window_count == 0) begin
+                amp_min = vin_count;
+                amp_max = vin_count;
+            end else begin
+                if (vin_count < amp_min) amp_min = vin_count;
+                if (vin_count > amp_max) amp_max = vin_count;
+            end
+            amp_window_count = amp_window_count + 1;
+            if (amp_window_count >= 100) begin
+                amp_counts = (amp_max - amp_min) / 2.0;
+                if (amp_counts >= 300.0) input_valid_candidate = 1;
+                else if (amp_counts <= 200.0) input_valid_candidate = 0;
+                if (input_valid_candidate) begin
+                    input_valid_on_count = input_valid_on_count + 1;
+                    input_valid_off_count = 0;
+                    if (input_valid_on_count >= 1) input_valid = 1;
+                end else begin
+                    input_valid_off_count = input_valid_off_count + 1;
+                    input_valid_on_count = 0;
+                    if (input_valid_off_count >= 1) input_valid = 0;
+                end
+                amp_window_count = 0;
+            end
+
+            input_valid_for_pll = (PLL_VALID_BYPASS_TEST != 0) ? 1 : input_valid;
+
+            adc_sample_count = adc_sample_count + 1;
+            if ((adc_sample_count % DECIM_N) == 0) begin
+                if (!input_valid_for_pll && (NCO_FIXED_60HZ_TEST == 0)) begin
+                    pi_enabled = 0; phase_initialized = 0;
+                    phase_ok = 0; pll_locked = 0;
+                    phase_ok_count = 0; phase_bad_count = 0;
+                    lock_count = 0; unlock_count = 0;
+                    err_lpf = 0.0; slow_lpf_q8 = 0.0; slow_err = 0.0;
+                    integral_hz = 0.0; frequency_est = 60.0;
+                    frequency_target = 60.0; theta = 0.0;
+                    va_n1 = 0.0; va_n2 = 0.0;
+                    vb_n1 = 0.0; vb_n2 = 0.0;
+                    vin_n1 = 0.0; vin_n2 = 0.0;
+                end else begin
+                    va_new = B0 * (vin_count - vin_n2) - A1 * va_n1 - A2 * va_n2;
+                    vb_new = QB0 * vin_count + QB1 * vin_n1 + QB2 * vin_n2
+                           - A1 * vb_n1 - A2 * vb_n2;
+                    vin_n2 = vin_n1; vin_n1 = vin_count;
+                    va_n2 = va_n1; va_n1 = va_new;
+                    vb_n2 = vb_n1; vb_n1 = vb_new;
+
+                    if (PHASE_INIT_ENABLE != 0 && !phase_initialized) begin
+                        phase_init_count = phase_init_count + 1;
+                        pi_enabled = 0;
+                        if (phase_init_count >= 100) begin
+                            best_abs_vq = 1.0e30;
+                            same_best_abs_vq = 1.0e30;
+                            best_index = 0;
+                            have_same_sign = 0;
+                            use_input_sign = (vin_count > 50.0 || vin_count < -50.0) ? 1 : 0;
+                            for (candidate_index = 0; candidate_index < 360; candidate_index = candidate_index + 1) begin
+                                candidate_theta = candidate_index * PI / 180.0;
+                                candidate_vq = va_new * cos(candidate_theta + PHASE_COMP_DEG * PI / 180.0)
+                                              + vb_new * sin(candidate_theta + PHASE_COMP_DEG * PI / 180.0);
+                                if (((candidate_vq >= 0.0) ? candidate_vq : -candidate_vq) < best_abs_vq) begin
+                                    best_abs_vq = (candidate_vq >= 0.0) ? candidate_vq : -candidate_vq;
+                                    best_index = candidate_index;
+                                end
+                                same_sign = 0;
+                                if (use_input_sign && vin_count > 50.0 && sin(candidate_theta) >= 0.0)
+                                    same_sign = 1;
+                                else if (use_input_sign && vin_count < -50.0 && sin(candidate_theta) <= 0.0)
+                                    same_sign = 1;
+                                if (same_sign && (((candidate_vq >= 0.0) ? candidate_vq : -candidate_vq) < same_best_abs_vq)) begin
+                                    same_best_abs_vq = (candidate_vq >= 0.0) ? candidate_vq : -candidate_vq;
+                                    best_index = candidate_index;
+                                    have_same_sign = 1;
+                                end
+                            end
+                            theta = best_index * PI / 180.0;
+                            phase_initialized = 1;
+                            pi_enabled = 1;
+                            phase_init_count = 0;
+                        end
+                    end else begin
+                        phase_initialized = 1;
+                        pi_enabled = 1;
+                    end
+
+                    theta_det = theta + PHASE_COMP_DEG * PI / 180.0;
+                    if (theta_det >= 2.0 * PI) theta_det = theta_det - 2.0 * PI;
+                    sin_theta = sin(theta_det);
+                    cos_theta = cos(theta_det);
+                    vq = va_new * cos_theta + vb_new * sin_theta;
+                    abs_va = (va_new >= 0.0) ? va_new : -va_new;
+                    abs_vb = (vb_new >= 0.0) ? vb_new : -vb_new;
+                    maxv = (abs_va >= abs_vb) ? abs_va : abs_vb;
+                    minv = (abs_va >= abs_vb) ? abs_vb : abs_va;
+                    vmag = maxv + minv / 2.0;
+                    if (vmag < VMAG_MIN) vmag = VMAG_MIN;
+                    raw_err = vq / vmag * 1000.0;
+                    if (raw_err > ERR_LIMIT) raw_err = ERR_LIMIT;
+                    else if (raw_err < -ERR_LIMIT) raw_err = -ERR_LIMIT;
+
+                    err_lpf = err_lpf + (raw_err - err_lpf) / 64.0;
+                    target_delta = err_lpf * 256.0 - slow_lpf_q8;
+                    if (target_delta > 500.0 * 256.0) target_delta = 500.0 * 256.0;
+                    else if (target_delta < -500.0 * 256.0) target_delta = -500.0 * 256.0;
+                    slow_lpf_q8 = slow_lpf_q8 + target_delta / 32.0;
+                    if (slow_lpf_q8 > 1000.0 * 256.0) slow_lpf_q8 = 1000.0 * 256.0;
+                    else if (slow_lpf_q8 < -1000.0 * 256.0) slow_lpf_q8 = -1000.0 * 256.0;
+                    slow_err = (slow_lpf_q8 >= 0.0) ?
+                               floor((slow_lpf_q8 + 128.0) / 256.0) :
+                               -floor((-slow_lpf_q8 + 128.0) / 256.0);
+
+                    if (NCO_FIXED_60HZ_TEST != 0) begin
+                        pi_error = 0.0;
+                        integral_hz = 0.0;
+                        frequency_target = 60.0;
+                    end else if (pi_enabled && phase_initialized) begin
+                        if (pll_locked && phase_ok) pi_error = slow_err;
+                        else pi_error = err_lpf;
+                        if (pll_locked && phase_ok && (((slow_err >= 0.0) ? slow_err : -slow_err) <= 5.0))
+                            pi_error = 0.0;
+
+                        e_pu = pi_error / 1000.0;
+                        target_delta = KP_HZ_PER_PU * e_pu;
+                        if (!(pll_locked && phase_ok && (((slow_err >= 0.0) ? slow_err : -slow_err) <= 5.0))) begin
+                            integral_hz = integral_hz + KI_HZ_PER_S_PER_PU * e_pu / FS_PLL;
+                            if (integral_hz > INT_LIMIT_HZ) integral_hz = INT_LIMIT_HZ;
+                            else if (integral_hz < -INT_LIMIT_HZ) integral_hz = -INT_LIMIT_HZ;
+                        end
+                        frequency_target = 60.0 + target_delta + integral_hz;
+                        if (frequency_target > 65.0) frequency_target = 65.0;
+                        else if (frequency_target < 55.0) frequency_target = 55.0;
+
+                        // Firmware anti-windup: undo an integral move that pushes
+                        // against the 55/65 Hz target limit in the same direction.
+                        if ((frequency_target >= 65.0 && pi_error > 0.0) ||
+                            (frequency_target <= 55.0 && pi_error < 0.0)) begin
+                            integral_hz = integral_hz - KI_HZ_PER_S_PER_PU * e_pu / FS_PLL;
+                            if (integral_hz > INT_LIMIT_HZ) integral_hz = INT_LIMIT_HZ;
+                            else if (integral_hz < -INT_LIMIT_HZ) integral_hz = -INT_LIMIT_HZ;
+                            frequency_target = 60.0 + target_delta + integral_hz;
+                            if (frequency_target > 65.0) frequency_target = 65.0;
+                            else if (frequency_target < 55.0) frequency_target = 55.0;
+                        end
+                    end else begin
+                        frequency_target = 60.0;
+                        integral_hz = 0.0;
+                    end
+
+                    applied_delta = frequency_target - frequency_est;
+                    if (applied_delta > ((pll_locked && phase_ok) ? LOCK_SLEW_HZ_PER_S : ACQ_SLEW_HZ_PER_S) / FS_PLL)
+                        applied_delta = ((pll_locked && phase_ok) ? LOCK_SLEW_HZ_PER_S : ACQ_SLEW_HZ_PER_S) / FS_PLL;
+                    else if (applied_delta < -((pll_locked && phase_ok) ? LOCK_SLEW_HZ_PER_S : ACQ_SLEW_HZ_PER_S) / FS_PLL)
+                        applied_delta = -((pll_locked && phase_ok) ? LOCK_SLEW_HZ_PER_S : ACQ_SLEW_HZ_PER_S) / FS_PLL;
+                    last_step_delta = applied_delta;
+                    frequency_est = frequency_est + applied_delta;
+                    if (frequency_est > 65.0) frequency_est = 65.0;
+                    else if (frequency_est < 55.0) frequency_est = 55.0;
+                    if (((frequency_est - 60.0 >= 0.0) ? frequency_est - 60.0 : 60.0 - frequency_est) > max_frequency_excursion)
+                        max_frequency_excursion = (frequency_est - 60.0 >= 0.0) ? frequency_est - 60.0 : 60.0 - frequency_est;
+
+                    if (phase_ok && ($abstime >= 0.45)) begin
+                        steady_error_sum = steady_error_sum + ((slow_err >= 0.0) ? slow_err : -slow_err);
+                        steady_error_count = steady_error_count + 1;
+                    end
+
+                    if (pi_enabled && input_valid_for_pll && (((slow_err >= 0.0) ? slow_err : -slow_err) <= 180.0)) begin
+                        if (phase_ok_count < 10) phase_ok_count = phase_ok_count + 1;
+                        phase_bad_count = 0;
+                        if (phase_ok_count >= 10 && !phase_ok) begin
+                            phase_ok = 1;
+                            if (!have_phase_ok_time) begin
+                                phase_ok_time = $abstime; have_phase_ok_time = 1;
+                                $display("pll_lock_test phase_ok_time = %g s", phase_ok_time);
+                            end
+                        end
+                    end else if (((slow_err >= 0.0) ? slow_err : -slow_err) > 360.0) begin
+                        phase_ok_count = 0;
+                        if (phase_bad_count < 300) phase_bad_count = phase_bad_count + 1;
+                        if (phase_bad_count >= 300) phase_ok = 0;
+                    end
+
+                    if (pi_enabled && input_valid_for_pll && (((err_lpf >= 0.0) ? err_lpf : -err_lpf) <= 180.0) &&
+                        (frequency_est >= LOCK_FREQ_MIN) && (frequency_est <= LOCK_FREQ_MAX) &&
+                        (((last_step_delta >= 0.0) ? last_step_delta : -last_step_delta) <= LOCK_STEP_DELTA_HZ)) begin
+                        if (lock_count < 20) lock_count = lock_count + 1;
+                        unlock_count = 0;
+                        if (lock_count >= 20 && !pll_locked) begin
+                            pll_locked = 1;
+                            if (!have_lock_time) begin
+                                lock_time = $abstime; have_lock_time = 1;
+                                $display("pll_lock_test lock_time = %g s", lock_time);
+                            end
+                        end
+                    end else if (!pi_enabled || !input_valid_for_pll || (((err_lpf >= 0.0) ? err_lpf : -err_lpf) > 360.0) ||
+                                 (frequency_est < LOCK_FREQ_MIN) || (frequency_est > LOCK_FREQ_MAX) ||
+                                 (((last_step_delta >= 0.0) ? last_step_delta : -last_step_delta) > LOCK_STEP_DELTA_HZ)) begin
+                        lock_count = 0;
+                        if (pll_locked) begin
+                            if (unlock_count < 120) unlock_count = unlock_count + 1;
+                            if (unlock_count >= 120) pll_locked = 0;
+                        end else unlock_count = 0;
+                    end
+
+                    cond_pi_enabled = pi_enabled ? 1 : 0;
+                    cond_input_valid = input_valid_for_pll ? 1 : 0;
+                    cond_err = (((err_lpf >= 0.0) ? err_lpf : -err_lpf) <= 180.0) ? 1 : 0;
+                    cond_freq = ((frequency_est >= LOCK_FREQ_MIN) &&
+                                 (frequency_est <= LOCK_FREQ_MAX)) ? 1 : 0;
+                    cond_step_delta = (((last_step_delta >= 0.0) ? last_step_delta :
+                                        -last_step_delta) <= LOCK_STEP_DELTA_HZ) ? 1 : 0;
+                    lock_condition = (cond_pi_enabled && cond_input_valid &&
+                                      cond_err && cond_freq && cond_step_delta) ? 1 : 0;
+
+                    theta = theta + 2.0 * PI * frequency_est / FS_PLL;
+                    if (theta >= 2.0 * PI) theta = theta - 2.0 * PI;
+                    pll_update_count = pll_update_count + 1;
+
+                    // Interpolate zero crossings between adjacent 2.5 kHz PLL
+                    // samples. Wrapping selects the nearest same-cycle crossing.
+                    if ((prev_pll_sample < 0.0) && (sin(theta) >= 0.0)) begin
+                        crossing_fraction = -prev_pll_sample / (sin(theta) - prev_pll_sample);
+                        t_pll_zc_now = $abstime - 1.0 / FS_PLL + crossing_fraction / FS_PLL;
+                        have_pll_zc = 1;
+                        if (have_grid_period && have_grid_zc) begin
+                            pair_dt = t_pll_zc_now - t_grid_zc_now;
+                            while (pair_dt >= 0.5 * grid_period_meas) pair_dt = pair_dt - grid_period_meas;
+                            while (pair_dt < -0.5 * grid_period_meas) pair_dt = pair_dt + grid_period_meas;
+                            phase_dt = pair_dt;
+                            phase_diff_deg = 360.0 * phase_dt / grid_period_meas;
+                        end
+                    end
+                    if ((prev_alpha_sample < 0.0) && (va_new >= 0.0)) begin
+                        crossing_fraction = -prev_alpha_sample / (va_new - prev_alpha_sample);
+                        t_alpha_zc_now = $abstime - 1.0 / FS_PLL + crossing_fraction / FS_PLL;
+                        have_alpha_zc = 1;
+                        if (have_grid_period && have_grid_zc) begin
+                            pair_dt = t_alpha_zc_now - t_grid_zc_now;
+                            while (pair_dt >= 0.5 * grid_period_meas) pair_dt = pair_dt - grid_period_meas;
+                            while (pair_dt < -0.5 * grid_period_meas) pair_dt = pair_dt + grid_period_meas;
+                            input_alpha_phase_deg = 360.0 * pair_dt / grid_period_meas;
+                        end
+                    end
+                    if ((prev_beta_sample < 0.0) && (vb_new >= 0.0)) begin
+                        crossing_fraction = -prev_beta_sample / (vb_new - prev_beta_sample);
+                        t_beta_zc_now = $abstime - 1.0 / FS_PLL + crossing_fraction / FS_PLL;
+                        have_beta_zc = 1;
+                        if (have_grid_period && have_alpha_zc) begin
+                            pair_dt = t_beta_zc_now - t_alpha_zc_now;
+                            while (pair_dt >= 0.5 * grid_period_meas) pair_dt = pair_dt - grid_period_meas;
+                            while (pair_dt < -0.5 * grid_period_meas) pair_dt = pair_dt + grid_period_meas;
+                            sogi_phase_diff_deg = 360.0 * pair_dt / grid_period_meas;
+                        end
+                    end
+                    prev_pll_sample = sin(theta);
+                    prev_alpha_sample = va_new;
+                    prev_beta_sample = vb_new;
+                end
+            end
+            alpha_dbg_voltage = va_new / 1000.0;
+            beta_dbg_voltage = vb_new / 1000.0;
+            pll_sin_voltage = sin(theta);
+            phase_error_voltage = err_lpf / 1000.0;
+            freq_dbg_voltage = frequency_est / 10.0;
+            locked_voltage = pll_locked ? 5.0 : 0.0;
+            phase_ok_voltage = phase_ok ? 5.0 : 0.0;
+            amp_window_voltage = amp_counts / 1000.0;
+            window_max_voltage = amp_max / 1000.0;
+            window_min_voltage = amp_min / 1000.0;
+            window_count_voltage = amp_window_count / 100.0;
+            theta_voltage = theta / (2.0 * PI);
+            pll_sin_raw_voltage = sin(theta);
+            err_fast_voltage = err_lpf / 1000.0;
+            err_slow_voltage = slow_err / 1000.0;
+            input_valid_voltage = input_valid ? 5.0 : 0.0;
+            input_valid_for_pll_voltage = input_valid_for_pll ? 5.0 : 0.0;
+            phase_diff_voltage = phase_diff_deg * 0.010;
+            phase_dt_voltage = phase_dt * 1000.0;
+            grid_freq_meas_voltage = grid_freq_meas / 10.0;
+            sogi_phase_diff_voltage = sogi_phase_diff_deg * 0.010;
+            input_alpha_phase_voltage = input_alpha_phase_deg * 0.010;
+            lock_condition_voltage = lock_condition ? 5.0 : 0.0;
+            phase_on_count_voltage = phase_ok_count / 10.0;
+            phase_off_count_voltage = phase_bad_count / 100.0;
+            lock_count_voltage = lock_count / 10.0;
+            unlock_count_voltage = unlock_count / 100.0;
+            step_delta_voltage = last_step_delta;
+
+            if (($abstime >= 0.5) && !stats_reported) begin
+                stats_reported = 1;
+                if (steady_error_count > 0)
+                    $display("pll_lock_test metrics: lock_time=%g phase_ok_time=%g max_frequency_excursion=%g Hz steady_state_error=%g mpu",
+                             lock_time, phase_ok_time, max_frequency_excursion,
+                             steady_error_sum / steady_error_count);
+                else
+                    $display("pll_lock_test metrics: lock_time=%g phase_ok_time=%g max_frequency_excursion=%g Hz steady_state_error=not_available",
+                             lock_time, phase_ok_time, max_frequency_excursion);
+            end
+        end
+
+        V(v_input_dbg) <+ input_dbg_voltage;
+        if (DEBUG_MINIMAL_OUTPUT == 0) begin
+            V(v_sogi_alpha) <+ transition(alpha_dbg_voltage, 0.0, 100n, 100n);
+            V(v_sogi_beta) <+ transition(beta_dbg_voltage, 0.0, 100n, 100n);
+            V(v_phase_error) <+ transition(phase_error_voltage, 0.0, 100n, 100n);
+            V(v_phase_ok) <+ transition(phase_ok_voltage, 0.0, 100n, 100n);
+            V(v_err_fast_dbg) <+ transition(err_fast_voltage, 0.0, 100n, 100n);
+            V(v_err_slow_dbg) <+ transition(err_slow_voltage, 0.0, 100n, 100n);
+            V(v_input_valid_dbg) <+ transition(input_valid_voltage, 0.0, 100n, 100n);
+            V(v_lock_condition_dbg) <+ transition(lock_condition_voltage, 0.0, 100n, 100n);
+            V(v_phase_on_count_dbg) <+ transition(phase_on_count_voltage, 0.0, 100n, 100n);
+            V(v_phase_off_count_dbg) <+ transition(phase_off_count_voltage, 0.0, 100n, 100n);
+            V(v_lock_count_dbg) <+ transition(lock_count_voltage, 0.0, 100n, 100n);
+            V(v_unlock_count_dbg) <+ transition(unlock_count_voltage, 0.0, 100n, 100n);
+            V(v_step_delta_dbg) <+ transition(step_delta_voltage, 0.0, 100n, 100n);
+        end
+        V(v_pll_sin) <+ transition(pll_sin_voltage, 0.0, 100n, 100n);
+        V(v_freq_dbg) <+ transition(freq_dbg_voltage, 0.0, 100n, 100n);
+        V(v_locked) <+ transition(locked_voltage, 0.0, 100n, 100n);
+        V(v_input_valid_original_dbg) <+ transition(input_valid_voltage, 0.0, 100n, 100n);
+        V(v_input_valid_for_pll_dbg) <+ transition(input_valid_for_pll_voltage, 0.0, 100n, 100n);
+        V(v_phase_diff_deg_dbg) <+ transition(phase_diff_voltage, 0.0, 100n, 100n);
+        V(v_phase_dt_dbg) <+ transition(phase_dt_voltage, 0.0, 100n, 100n);
+        V(v_grid_freq_meas_dbg) <+ transition(grid_freq_meas_voltage, 0.0, 100n, 100n);
+        V(v_sogi_phase_diff_dbg) <+ transition(sogi_phase_diff_voltage, 0.0, 100n, 100n);
+        V(v_input_alpha_phase_dbg) <+ transition(input_alpha_phase_voltage, 0.0, 100n, 100n);
+        if (DEBUG_MINIMAL_OUTPUT == 0) begin
+            V(v_amp_window_dbg) <+ transition(amp_window_voltage, 0.0, 100n, 100n);
+            V(v_window_max_dbg) <+ transition(window_max_voltage, 0.0, 100n, 100n);
+            V(v_window_min_dbg) <+ transition(window_min_voltage, 0.0, 100n, 100n);
+            V(v_window_count_dbg) <+ transition(window_count_voltage, 0.0, 100n, 100n);
+            V(v_theta_dbg) <+ transition(theta_voltage, 0.0, 100n, 100n);
+            V(v_pll_sin_raw_dbg) <+ transition(pll_sin_raw_voltage, 0.0, 100n, 100n);
+        end
+    end
+endmodule

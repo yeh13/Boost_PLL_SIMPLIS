@@ -1,0 +1,605 @@
+[
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/MATLAB/stage17_model_60hz.m",
+    "Bytes": 4815,
+    "Date": "2026-09-10T14:33:42.0000000+08:00",
+    "SHA256": "EA6674FDB66394C3B62B3C3BA2A886D3C06ADAAF21ADBC6EB61858AD1C50DD76",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\stage17_model_60hz.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/MATLAB/firmware_config.m",
+    "Bytes": 1041,
+    "Date": "2026-09-10T13:05:34.0000000+08:00",
+    "SHA256": "EAC61689754FAEF6FBEF6707FDBAF6BB0798224ADB35C40D3D2E2274BD1B3871",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\firmware_config.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/MATLAB/sin_table.csv",
+    "Bytes": 2259,
+    "Date": "2026-09-10T13:05:34.0000000+08:00",
+    "SHA256": "B4D598483BBF084B8B577EEAA3FD6C60C8F8F582BAA3FE0693CA2505557AF8F0",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\sin_table.csv",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/MATLAB/vref_table.csv",
+    "Bytes": 1607,
+    "Date": "2026-09-10T13:05:36.0000000+08:00",
+    "SHA256": "61667C7DF0858F746E0A4951E279F525B3001F523A2E708C001A81DC160B6BE6",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\vref_table.csv",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/MATLAB/reference_metrics.m",
+    "Bytes": 1766,
+    "Date": "2026-09-10T14:49:22.0000000+08:00",
+    "SHA256": "88D29F1898349D334C9925CDB95869FB95951246A07A3699C6A02C76E0703EE3",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\reference_metrics.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/MATLAB/sine_q15_ticks.m",
+    "Bytes": 422,
+    "Date": "2026-09-10T14:49:24.0000000+08:00",
+    "SHA256": "AEBDAF4F62EF31BFF058CAAFC7EBE103C8248D4F4CB72705DC3D401E1B88A522",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\sine_q15_ticks.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/MATLAB/phase_delivery_8tick.m",
+    "Bytes": 1810,
+    "Date": "2026-09-10T15:00:44.0000000+08:00",
+    "SHA256": "9CF7904F48C405569B2E25508D97FE4C5A4839A34D17C2BFB769CACD8CA473D0",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\phase_delivery_8tick.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/MATLAB/check_delivery_vectors.m",
+    "Bytes": 1549,
+    "Date": "2026-09-10T15:00:46.0000000+08:00",
+    "SHA256": "2E689FE97EFD57F360C8AA9AB505E750135562613A6654D97FF2DA133E7EE969",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\check_delivery_vectors.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/MATLAB/run_fixed60_phase40k.m",
+    "Bytes": 9178,
+    "Date": "2026-09-10T15:00:56.0000000+08:00",
+    "SHA256": "5C4520E935FB1D552D0CE693564F0CEE1D5881DD6DBAB1D24330063501BE2CD0",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\run_fixed60_phase40k.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/MATLAB/plot_fixed60_integration.m",
+    "Bytes": 3333,
+    "Date": "2026-09-10T15:01:00.0000000+08:00",
+    "SHA256": "5A13D26F09C14C149530F3192EA5BD43492D0B9FCEF770781CD342297C2AB4A1",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\plot_fixed60_integration.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/MATLAB/README.md",
+    "Bytes": 740,
+    "Date": "2026-09-10T15:01:28.0000000+08:00",
+    "SHA256": "85A12EF6244DBF7C94145720CF950A667B055197F53023191CBF675B0943B964",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\README.md",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/MATLAB/INTEGRATION_GUIDE.md",
+    "Bytes": 11888,
+    "Date": "2026-09-10T15:01:38.0000000+08:00",
+    "SHA256": "5AA5548D4B3A7FE750F551341DC3BFD8494C69D6912FD00AAF81C65A96876A08",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\INTEGRATION_GUIDE.md",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/VERILOG/fixed60_pll_5k_candidate.v",
+    "Bytes": 12236,
+    "Date": "2026-09-10T14:49:40.0000000+08:00",
+    "SHA256": "9BD421F6A95609065698CB24AA1C920CB1742E4B38518DC6220F8DABEA29E44C",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\VERILOG\\fixed60_pll_5k_candidate.v",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/VERILOG/fixed60_pll_phase40k_candidate.v",
+    "Bytes": 15317,
+    "Date": "2026-09-10T15:01:12.0000000+08:00",
+    "SHA256": "A4BE11244FB417D0D769E72C96482A7B40CC004FF2E9203FB35901E839844CE6",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\VERILOG\\fixed60_pll_phase40k_candidate.v",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/RESULTS/INVENTORY_BEFORE.csv",
+    "Bytes": 8337,
+    "Date": "2026-09-10T14:47:30.0000000+08:00",
+    "SHA256": "47B489AB0EC61C4221F971EA8ADF33CDD695950CB1024B77CB965439B941202E",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\RESULTS\\INVENTORY_BEFORE.csv",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/RESULTS/OLD_FILES_SHA256.csv",
+    "Bytes": 14476,
+    "Date": "2026-09-10T14:47:30.0000000+08:00",
+    "SHA256": "6EF32093C20A806DCA3BE0B0CA7E6D68BC64C79E0EA4D8537824135C48F88C55",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\RESULTS\\OLD_FILES_SHA256.csv",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/RESULTS/FIRMWARE_SHA256.csv",
+    "Bytes": 433,
+    "Date": "2026-09-10T14:47:30.0000000+08:00",
+    "SHA256": "7DA866CC56CCE3214E0605218C88D10D661DC6A622C2632A7BD28C39334F231D",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\RESULTS\\FIRMWARE_SHA256.csv",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/RESULTS/MODEL_SOURCE_SHA256.csv",
+    "Bytes": 323,
+    "Date": "2026-09-10T14:47:30.0000000+08:00",
+    "SHA256": "91279D23D656E9ECC4372C98E59CA75B9250C6064E67AE677C541B76A9FAFFB1",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\RESULTS\\MODEL_SOURCE_SHA256.csv",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/RESULTS/README.md",
+    "Bytes": 834,
+    "Date": "2026-09-10T14:49:28.0000000+08:00",
+    "SHA256": "ED738B49E8F5F6B6D316205C14C46744FCE90BEF50758582CDF6DFEAD8A739B8",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\RESULTS\\README.md",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/RESULTS/INVENTORY_CLASSIFICATION.md",
+    "Bytes": 1907,
+    "Date": "2026-09-10T14:49:42.0000000+08:00",
+    "SHA256": "0568E6EBB379FC2E878FAF4851F2B20552D44BC2A317CFC5AF66E3AE0B3BE165",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\RESULTS\\INVENTORY_CLASSIFICATION.md",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/RESULTS/DELIVERY_INPUT_SHA256.csv",
+    "Bytes": 761,
+    "Date": "2026-09-10T15:00:40.0000000+08:00",
+    "SHA256": "116E28CAB197A5F8601F37B56C7E4EF66302983E11931E018A5571620CF170EE",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\RESULTS\\DELIVERY_INPUT_SHA256.csv",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/RESULTS/DELIVERY_PREPARATION.md",
+    "Bytes": 659,
+    "Date": "2026-09-10T15:01:40.0000000+08:00",
+    "SHA256": "F888C33F4F77A32ACAF906E708608802637574FB04CFB63B449E0541949ABE49",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\RESULTS\\DELIVERY_PREPARATION.md",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION.zip",
+    "Entry": "FIXED60_PHASE40K_INTEGRATION/README.md",
+    "Bytes": 11888,
+    "Date": "2026-09-10T15:01:24.0000000+08:00",
+    "SHA256": "5AA5548D4B3A7FE750F551341DC3BFD8494C69D6912FD00AAF81C65A96876A08",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\README.md",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/stage17_model_60hz.m",
+    "Bytes": 4815,
+    "Date": "2026-09-10T14:33:42.0000000+08:00",
+    "SHA256": "EA6674FDB66394C3B62B3C3BA2A886D3C06ADAAF21ADBC6EB61858AD1C50DD76",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\stage17_model_60hz.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/firmware_config.m",
+    "Bytes": 1041,
+    "Date": "2026-09-10T13:05:34.0000000+08:00",
+    "SHA256": "EAC61689754FAEF6FBEF6707FDBAF6BB0798224ADB35C40D3D2E2274BD1B3871",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\firmware_config.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/sin_table.csv",
+    "Bytes": 2259,
+    "Date": "2026-09-10T13:05:34.0000000+08:00",
+    "SHA256": "B4D598483BBF084B8B577EEAA3FD6C60C8F8F582BAA3FE0693CA2505557AF8F0",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\sin_table.csv",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/vref_table.csv",
+    "Bytes": 1607,
+    "Date": "2026-09-10T13:05:36.0000000+08:00",
+    "SHA256": "61667C7DF0858F746E0A4951E279F525B3001F523A2E708C001A81DC160B6BE6",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\vref_table.csv",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/reference_metrics.m",
+    "Bytes": 1766,
+    "Date": "2026-09-10T14:49:22.0000000+08:00",
+    "SHA256": "88D29F1898349D334C9925CDB95869FB95951246A07A3699C6A02C76E0703EE3",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\reference_metrics.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/sine_q15_ticks.m",
+    "Bytes": 422,
+    "Date": "2026-09-10T14:49:24.0000000+08:00",
+    "SHA256": "AEBDAF4F62EF31BFF058CAAFC7EBE103C8248D4F4CB72705DC3D401E1B88A522",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\sine_q15_ticks.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/phase_delivery_8tick.m",
+    "Bytes": 1810,
+    "Date": "2026-09-10T15:00:44.0000000+08:00",
+    "SHA256": "9CF7904F48C405569B2E25508D97FE4C5A4839A34D17C2BFB769CACD8CA473D0",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\phase_delivery_8tick.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/check_delivery_vectors.m",
+    "Bytes": 1549,
+    "Date": "2026-09-10T15:00:46.0000000+08:00",
+    "SHA256": "2E689FE97EFD57F360C8AA9AB505E750135562613A6654D97FF2DA133E7EE969",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\check_delivery_vectors.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/run_fixed60_phase40k.m",
+    "Bytes": 9178,
+    "Date": "2026-09-10T15:00:56.0000000+08:00",
+    "SHA256": "5C4520E935FB1D552D0CE693564F0CEE1D5881DD6DBAB1D24330063501BE2CD0",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\run_fixed60_phase40k.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/plot_fixed60_integration.m",
+    "Bytes": 3333,
+    "Date": "2026-09-10T15:01:00.0000000+08:00",
+    "SHA256": "5A13D26F09C14C149530F3192EA5BD43492D0B9FCEF770781CD342297C2AB4A1",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\plot_fixed60_integration.m",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/README.md",
+    "Bytes": 740,
+    "Date": "2026-09-10T15:01:28.0000000+08:00",
+    "SHA256": "85A12EF6244DBF7C94145720CF950A667B055197F53023191CBF675B0943B964",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\README.md",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/INTEGRATION_GUIDE.md",
+    "Bytes": 11888,
+    "Date": "2026-09-10T15:01:38.0000000+08:00",
+    "SHA256": "5AA5548D4B3A7FE750F551341DC3BFD8494C69D6912FD00AAF81C65A96876A08",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\INTEGRATION_GUIDE.md",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB.zip",
+    "Entry": "MATLAB/export_fixed60_phase40k_short_golden.m",
+    "Bytes": 3007,
+    "Date": "2026-09-10T16:28:08.0000000+08:00",
+    "SHA256": "CC89E989CBA6CF7C6E616C30C62AFDC327B7AA5A919157DA85BEE9B5C575D4E6",
+    "LocalPath": "F:\\DAC test\\FIXED60_PHASE40K_INTEGRATION\\MATLAB\\export_fixed60_phase40k_short_golden.m",
+    "LocalComparison": "different"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/closed_loop_inverter.mc3",
+    "Bytes": 2603163,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "433532A7F8D5F8199B4DF61AA9A4D2357AAC12B2F252DCD5115CE4FE8847F5E2",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.mc3",
+    "LocalComparison": "different"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/Makefile",
+    "Bytes": 3381,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "7738BD127C11283E0B838075E6C48D2CF924A86637263E4B663B19E2C30DEB95",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\Makefile",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/watchdog.h",
+    "Bytes": 2622,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "CA0D1DC90DF63C2AA777AB16420FB7617B3A80466FD19BEEEFD474447A840B4B",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\watchdog.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/traps.h",
+    "Bytes": 2960,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "4AF66B1F9275929117D1AC8E198EDD0CE749E6F66471A4C41A847E6D52A44966",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\traps.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/traps.c",
+    "Bytes": 4991,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "2DE33730AD91A23090CAB13F60C6500956FC9ABBA4303AAC77F39C08123EC8F5",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\traps.c",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/system_types.h",
+    "Bytes": 6241,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "7B6970E649300A90231291DA6386EFAFFF392C212F364374CB57CE173CC2A518",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\system_types.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/system.h",
+    "Bytes": 3963,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "3DBD4BB74D7853A992546E48A4B89237D6645553E395355DC081A89546A65037",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\system.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/system.c",
+    "Bytes": 7051,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "FDE92817B5B3329E0290EDDD03671D72991FFA645B3A204E34B712E2E5283050",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\system.c",
+    "LocalComparison": "different"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/reset_types.h",
+    "Bytes": 3490,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "12DC21ED419CD0DBAE2A5D6969D456DDBB45A24AA28A4348B3915DFA166F7788",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\reset_types.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/reset.h",
+    "Bytes": 2649,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "58B240E4924DCA5172609F7AE6513490932EC1CC504D764CE16C3DF202322232",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\reset.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/reset.c",
+    "Bytes": 4743,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "48C1A30DDCF7A87E8A3A165B261E5B721793C3BDA2ED38879D48F5682E17A007",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\reset.c",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/pwm_module_features.h",
+    "Bytes": 5928,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "461E4E4EAF47747148ADC2D17EA4CCCFB609964CD944EABA5DA7FA2706620449",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\pwm_module_features.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/pwm.h",
+    "Bytes": 58329,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "28E676E46AE301854DC7CD1DAFC58C7B990AD56F9606DF9270E58ECBCD5E4D8F",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\pwm.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/pwm.c",
+    "Bytes": 24571,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "F9DA8F011B863E76C04B02600798CAD9F91175F73439B2585C54C5AEBC391159",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\pwm.c",
+    "LocalComparison": "different"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/pll_state.h",
+    "Bytes": 2744,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "8FCC3FF987887DE341B69557A638C44069358D4226CE43DC8D1E286D2A3B800C",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\pll_state.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/pll_state.c",
+    "Bytes": 570,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "51A04C4465340A67D665390B6AF9F0694F6C592ABC2BE66EF3C3796DF774B737",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\pll_state.c",
+    "LocalComparison": "different"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/pin_manager.h",
+    "Bytes": 7436,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "B3DDD3EF70C0650D7124FE1F51CBD97FE20B3A42248CACD0A2B91F85C3FAF0F8",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\pin_manager.h",
+    "LocalComparison": "different"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/pin_manager.c",
+    "Bytes": 3715,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "E48B1458412EF33419D942244C26B3E37B68D25DA5B843AA68CF707AE0ADBC6F",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\pin_manager.c",
+    "LocalComparison": "different"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/parameter.h",
+    "Bytes": 2992,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "86F0C93F9C8C218DBF8960B28FD06FB66F56A3A33993A7E069684EF429837D45",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\parameter.h",
+    "LocalComparison": "different"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/mcc.h",
+    "Bytes": 2255,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "2580BE91C75A0BD08349F380AEF8D5A8519B6D09DF027051B77D7276C78C4CCB",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\mcc.h",
+    "LocalComparison": "different"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/mcc.c",
+    "Bytes": 1854,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "EE06158789F090FE2CCEF4231E2BBDF4B72B37D6657128EA60337939D6B68992",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\mcc.c",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/interrupt_manager.h",
+    "Bytes": 3997,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "C2CA2FE6221B48134386BB832C675A7D98C8564BECEC891F02D1BD678D170891",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\interrupt_manager.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/interrupt_manager.c",
+    "Bytes": 2560,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "FC85DC7CE3297F5008F36F23280ABE6EE90EFE9740434CB49F08CEBC57810595",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\interrupt_manager.c",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/clock.h",
+    "Bytes": 2904,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "AB42DEF45640C495ED7FFEDF8BEC394FD1170AC4917347B1657A704953089CAA",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\clock.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/clock.c",
+    "Bytes": 4018,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "20DB992D0AC9EBBE085FB8CB687E9F07A50E3EE492E019E9999B936E657A015E",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\clock.c",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/adc_module_features.h",
+    "Bytes": 6245,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "FBE83592A10A724CC8C0469F8209754134E6F07226BCFD9F04CA6C750AFEF1E3",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\adc_module_features.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/adc1.h",
+    "Bytes": 32235,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "6C47554C66A542A1D8F8F908728ECE71BD9787E4B6E8601F81475A67A20595C1",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\adc1.h",
+    "LocalComparison": "identical"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/mcc_generated_files/adc1.c",
+    "Bytes": 21973,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "901A83ADBD1A5E03E65E99A991C1BC1D076A463F469B162BDC55A51647D50FCF",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\mcc_generated_files\\adc1.c",
+    "LocalComparison": "different"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/main.c",
+    "Bytes": 2089,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "062171230F2A5EDC3AF4D53D80B529679CB94CE0F7938FFB4A8DD319018BE086",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\main.c",
+    "LocalComparison": "different"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/nbproject/project.xml",
+    "Bytes": 1226,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "E14E8BBC2D070F96EE74A7E19B835B822DEC0F47E5072B38B52187C1AC399C83",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\nbproject\\project.xml",
+    "LocalComparison": "different"
+  },
+  {
+    "Archive": "F:\\Boost_I_loop_inverter.X\\closed_loop_inverter.zip",
+    "Entry": "closed_loop_inverter.X/nbproject/configurations.xml",
+    "Bytes": 11725,
+    "Date": "2026-03-06T13:29:28.0000000+08:00",
+    "SHA256": "96638AD2CBD084AA7A7B4D5BFEAB4D19984641FFBA90DCA274AA1784B583A5C2",
+    "LocalPath": "F:\\Boost_I_loop_inverter.X\\nbproject\\configurations.xml",
+    "LocalComparison": "different"
+  }
+]

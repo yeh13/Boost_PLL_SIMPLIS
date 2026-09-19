@@ -1,0 +1,50 @@
+﻿# MPLAB / XC generated outputs
+Boost_I_loop_inverter.X/build/
+Boost_I_loop_inverter.X/dist/
+Boost_I_loop_inverter.X/.generated_files/
+Boost_I_loop_inverter.X/nbproject/private/
+
+# Compiled MCU files
+*.o
+*.o.d
+*.elf
+*.hex
+*.map
+*.cof
+
+# Python
+__pycache__/
+*.pyc
+
+# MATLAB temporary
+*.asv
+*.m~
+slprj/
+codegen/
+
+# Verilog generated outputs
+*.vvp
+*.v.log
+
+# SIMPLIS generated runtime files
+**/SIMPLIS_Data/*.dbg
+**/SIMPLIS_Data/*.lst
+**/SIMPLIS_Data/*.t0
+**/SIMPLIS_Data/*.t1
+**/SIMPLIS_Data/*.t2
+**/SIMPLIS_Data/*.tc
+**/SIMPLIS_Data/*.GrpName
+
+# General temporary
+*.tmp
+*.bak
+*.cache
+
+# Editor / OS
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Archives not needed by default
+*.7z
+*.rar

@@ -1,0 +1,9 @@
+﻿{
+    "CheckedFiles":  197,
+    "ChangedOriginalFiles":  0,
+    "Changes":  [
+
+                ],
+    "Performed":  "Read-only inventory, source tracing, register decoding, existing artifact inspection; no new simulation",
+    "Report":  "ADC_PLL_INVENTORY_REPORT.md"
+}

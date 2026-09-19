@@ -1,0 +1,27 @@
+/**
+  Section: Included Files
+*/
+
+/* 1. ?????? FCY (???? #include ??) */
+/* ?? dsPIC33CK?? Fosc=200MHz, ? FCY=100MHz */
+#define FCY 100000000UL 
+
+#include "mcc_generated_files/system.h"
+#include <stdio.h>
+#include <libpic30.h>   /* 2. ????????????? __delay_ms */
+
+/*
+                         Main application
+ */
+int main(void)
+{
+    SYSTEM_Initialize();
+    
+    // ?????????????? ADC ????
+    // ADC1_Enable(); 
+    
+    while (1)
+    {
+    }
+    return 1;
+}

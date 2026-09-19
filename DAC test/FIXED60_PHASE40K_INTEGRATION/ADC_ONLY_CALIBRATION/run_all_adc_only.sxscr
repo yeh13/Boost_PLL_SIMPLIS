@@ -1,0 +1,25 @@
+* Run this script from the ADC_ONLY_CALIBRATION directory.
+* Native SIMPLIS ADC only. OFFSET remains zero.
+Set precision=17
+PreProcessNetlist point_00.net point_00.deck
+RunSIMPLIS /fresh point_00.deck
+Show /file point_00_raw.txt :1,:2,:3,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:30,:31,:32
+PreProcessNetlist point_01.net point_01.deck
+RunSIMPLIS /fresh point_01.deck
+Show /file point_01_raw.txt :1,:2,:3,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:30,:31,:32
+PreProcessNetlist point_02.net point_02.deck
+RunSIMPLIS /fresh point_02.deck
+Show /file point_02_raw.txt :1,:2,:3,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:30,:31,:32
+PreProcessNetlist point_03.net point_03.deck
+RunSIMPLIS /fresh point_03.deck
+Show /file point_03_raw.txt :1,:2,:3,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:30,:31,:32
+PreProcessNetlist point_04.net point_04.deck
+RunSIMPLIS /fresh point_04.deck
+Show /file point_04_raw.txt :1,:2,:3,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:30,:31,:32
+PreProcessNetlist point_05.net point_05.deck
+RunSIMPLIS /fresh point_05.deck
+Show /file point_05_raw.txt :1,:2,:3,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:30,:31,:32
+PreProcessNetlist point_06.net point_06.deck
+RunSIMPLIS /fresh point_06.deck
+Show /file point_06_raw.txt :1,:2,:3,:10,:11,:12,:13,:14,:15,:16,:17,:18,:19,:20,:21,:30,:31,:32
+

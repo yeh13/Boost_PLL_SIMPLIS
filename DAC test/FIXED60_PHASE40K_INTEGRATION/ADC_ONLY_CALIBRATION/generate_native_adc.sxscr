@@ -1,0 +1,7 @@
+OpenSchem "E:\DAC test\FIXED60_PHASE40K_INTEGRATION\ADC_ONLY_CALIBRATION\native_adc_template_source.sxsch"
+Unselect
+Select /prop REF U1
+Prop NUMBITS 12
+Prop RANGE 2.2021505376344086
+Prop OFFSET 0
+Netlist /simplis "E:\DAC test\FIXED60_PHASE40K_INTEGRATION\ADC_ONLY_CALIBRATION\native_adc_generated.net"
