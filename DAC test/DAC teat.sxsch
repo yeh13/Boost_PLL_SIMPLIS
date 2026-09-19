@@ -125,10 +125,21 @@ Property name="VALUESCRIPT" value="vl_edit_instance" autopos=1 normal=Left rotat
 Property name="VLPATH" value="dac_test_source.v" autopos=1 normal=Left rotated=Left protected=1 visible=0 font=Default order=-1
 .EndSymbol
 .Symbol
-Attributes format=1.0 revision=8 name="fixed60_pll_phase40k_candidate_2127009941" description="fixed60_pll_phase40k_candidate" catalog="Auto Created Symbols;Verilog-HDL Symbols"
+Attributes format=1.0 revision=8 name="fixed60_debug_terminal" description="Observation-only analog output" catalog="Connections;Terminals"
+Segment x1=120 y1=-60 x2=240 y2=-60 
+Segment x1=120 y1=-60 x2=120 y2=60 
+Segment x1=240 y1=-60 x2=240 y2=60 
+Segment x1=0 y1=0 x2=120 y2=0 
+Segment x1=120 y1=60 x2=240 y2=60 
+Pin name="A" order=1 x=0 y=0 visible=0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="DEBUG" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+.EndSymbol
+.Symbol
+Attributes format=1.0 revision=8 name="fixed60_pll_phase40k_debug_wrapper_symbol" description="Fixed60 candidate with observation-only taps" catalog="Auto Created Symbols;Verilog-HDL Symbols"
 Segment x1=0 y1=0 x2=1680 y2=0 
-Segment x1=0 y1=2880 x2=0 y2=0 
-Segment x1=1680 y1=0 x2=1680 y2=2880 
+Segment x1=0 y1=3120 x2=0 y2=0 
+Segment x1=1680 y1=0 x2=1680 y2=3120 
 Segment x1=-120 y1=240 x2=0 y2=240 
 Segment x1=1800 y1=240 x2=1680 y2=240 
 Segment x1=-120 y1=360 x2=0 y2=360 
@@ -153,7 +164,7 @@ Segment x1=1800 y1=2280 x2=1680 y2=2280
 Segment x1=1800 y1=2400 x2=1680 y2=2400 
 Segment x1=1800 y1=2520 x2=1680 y2=2520 
 Segment x1=1800 y1=2640 x2=1680 y2=2640 
-Segment x1=1680 y1=2880 x2=0 y2=2880 
+Segment x1=1680 y1=3120 x2=0 y2=3120 
 Pin name="ac_input(0:11)" order=1 x=-120 y=240 visible=1 xlabel=144 ylabel=0 align=LeftBase rotated=0
 Pin name="anchor_residual(0:63)" order=23 x=1800 y=2520 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
 Pin name="base_step_40k(0:63)" order=14 x=1800 y=1440 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
@@ -180,7 +191,7 @@ Pin name="substep(0:2)" order=20 x=1800 y=2160 visible=1 xlabel=-144 ylabel=0 al
 Pin name="theta_40k(0:32)" order=13 x=1800 y=1320 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
 Property name="LABELS" value="Voltage input logic 0 threshold,Voltage input logic 1 threshold,Voltage output for logic 0,Voltage output for logic 1,Rise time 0 -> 1,Fall time 1 -> 0,Input resistance,Output resistance,Output Hi-Z resistance,Threshold time tolerance,Disable output of non-analog vectors:BOOL,Disable module cache:BOOL" autopos=1 normal=Left rotated=Left protected=1 visible=0 font=Default order=-1
 Property name="MODEL" value="U" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
-Property name="MODULENAME" value="fixed60_pll_phase40k_candidate" autopos=1 normal=Top rotated=Right font=Default order=-1
+Property name="MODULENAME" value="fixed60_pll_phase40k_debug_wrapper" autopos=1 normal=Top rotated=Right font=Default order=-1
 Property name="PARAM_VALUES" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
 Property name="PARAMETERS" value="in_low=2.2 in_high=2.3 out_low=0 out_high=5 t_rise=100p t_fall=100p in_res=1T out_res=100 out_res_hiz=1T time_tol=100p disable_internal_vectors=0 disable_module_cache=0" autopos=1 normal=Left rotated=Left protected=1 visible=0 font=Default order=-1
 Property name="pinprop$1$bus" value="" autopos=1 normal=Left rotated=Left protected=1 visible=0 font=Default order=-1
@@ -237,11 +248,17 @@ Property name="SIMPLIS_PARAM_VALUES" value="RIN=10e6 ROUT=10.0 TH=2.5 HYSTWD=0.1
 Property name="SIMPLIS_PARAMETERS" value="RIN=10e6 ROUT=10.0 TH=2.5 HYSTWD=0.1 VOL=0.0 VOH=5.0 GNDREF=N" autopos=1 normal=Left rotated=Left protected=1 visible=0 font=Default order=-1
 Property name="SIMPLIS_PASSTHROUGH1" value="" autopos=1 normal=Top rotated=Top visible=0 font=Default displayName=1 order=-1
 Property name="SIMPLIS_PASSTHROUGH2" value="" autopos=1 normal=Top rotated=Top visible=0 font=Default displayName=1 order=-1
-Property name="SIMPLIS_TEMPLATE" value=";X$<ref> <nodelist> <ref>_VERILOG_SUB %SIMPLIS_PASSTHROUGH1%;.SUBCKT <ref>_VERILOG_SUB  1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 265 266 267 268 269 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308 309 310 311 312 313 314 315 316 317 318 319 320 321 322 323 324 325 326 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 355 356 357 358 359 360 361 362 363 364 365 366 367 368 369 370 371 372 373 374 375 376 377 378 379 380 381 382 383 384 385 386 387 388 389 390 391 392 393 394 395 396 397 398 399 400 401 402 403 404 405 406 407 408 409 410 411 412 413 414 415 416 417 418 419 420 421 422 423 424 425 426 427 428 429 430 431 432 433 434 435 436 437 438 439 440 441 442 443 444 445 446 447 448 449 450 451 452 453 454 455 456 457 458 459 460 461 462 463 464 465 466 467 468 469 470 471 472 473 474 475 476 477 478 479 480 481 482 483 484 485 486 487 488 489 490 491 492 493 494 495 496 497 498 499 500 501 502 503 504 505 506 507 508 509 510 511 512 513 514 515 516 517 518 519 520 521 522 523 524 525 526 527 528 529 530 531 532 533 534 535 536 537 538 539 540 541 542 543 544 545 546 547 548 549 550 551 552 553 554 555 556 557 558 559 560 561 562 563 564 565 566 567 568 569 570 571 572 573 574 575 576 577 578 579 580 581 582 583 584 585 586 587 588 589 590 591 592 593 594 595 596 597 598 599 600 601 602 603 604 605 606 607 608 609 610 611 612 613 614 615 616 617 618 619 620 621 622 623 624 625 626 627 628 629 630 631 632 633 634 635 636 637 638 639 640 641 642 643 644 645 646 647 648 649 650 651 652 653 654 655 656 657 658 659 660 %SIMPLIS_PASSTHROUGH2%;!V_VERILOG [ 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 265 266 267 268 269 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308 309 310 311 312 313 314 315 316 317 318 319 320 321 322 323 324 325 326 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 355 356 357 358 359 360 361 362 363 364 365 366 367 368 369 370 371 372 373 374 375 376 377 378 379 380 381 382 383 384 385 386 387 388 389 390 391 392 393 394 395 396 397 398 399 400 401 402 403 404 405 406 407 408 409 410 411 412 413 414 415 416 417 418 419 420 421 422 423 424 425 426 427 428 429 430 431 432 433 434 435 436 437 438 439 440 441 442 443 444 445 446 447 448 449 450 451 452 453 454 455 456 457 458 459 460 461 462 463 464 465 466 467 468 469 470 471 472 473 474 475 476 477 478 479 480 481 482 483 484 485 486 487 488 489 490 491 492 493 494 495 496 497 498 499 500 501 502 503 504 505 506 507 508 509 510 511 512 513 514 515 516 517 518 519 520 521 522 523 524 525 526 527 528 529 530 531 532 533 534 535 536 537 538 539 540 541 542 543 544 545 546 547 548 549 550 551 552 553 554 555 556 557 558 559 560 561 562 563 564 565 566 567 568 569 570 571 572 573 574 575 576 577 578 579 580 581 582 583 584 585 586 587 588 589 590 591 592 593 594 595 596 597 598 599 600 601 602 603 604 605 606 607 608 609 610 611 612 613 614 615 616 617 618 619 620 621 622 623 624 625 626 627 628 629 630 631 632 633 634 635 636 637 638 639 640 641 642 643 644 645 646 647 648 649 650 651 652 653 654 655 656 657 658 659 660 ] [ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 ] MODEL=M_VERILOG_M;.MODEL M_VERILOG_M VERILOG_HDL_MODULE MODULE=\"%MODULENAME%\";+ MODULE_SOURCE=\"%VLPATH%\";+ OUTPUT=\"phase_ok,1,locked,1,hold_60hz,1,pll_phase_5k,30,pll_phase_post_5k,30,pll_step_q,32,slow_error,32,input_valid,1,pll_update,1,theta_40k,33,base_step_40k,64,phase_error,64,correction_quotient,64,correction_remainder,64,correction_applied,64,correction_remaining,64,substep,3,held_ref,16,extrapolated_ref,16,anchor_residual,64,interval_complete,1\" INPUT=\"ac_input,12,clk,1,reset,1\";+ %SIMPLIS_PARAM_VALUES%;.ENDS <ref>_VERILOG_SUB" autopos=1 normal=Top rotated=Top visible=0 font=Default displayName=1 order=-1
-Property name="SIMULATOR" value="DUAL" autopos=1 normal=Top rotated=Top visible=0 font=Default displayName=1 order=-1
+Property name="SIMULATOR" value="SIMETRIX" autopos=1 normal=Top rotated=Top visible=0 font=Default displayName=1 order=-1
 Property name="TEMPLATE" value="<ref> <nodelist> %ref%$TP_%MODULENAME%;.MODEL %ref%$TP_%MODULENAME% vsxa load=\"<schemdir>/%VLPATH%\" %PARAM_VALUES%" autopos=1 normal=Left rotated=Left protected=1 visible=0 font=Default order=-1
 Property name="VALUESCRIPT" value="vl_edit_instance" autopos=1 normal=Left rotated=Left protected=1 visible=0 font=Default order=-1
-Property name="VLPATH" value="FIXED60_PHASE40K_INTEGRATION/VERILOG/fixed60_pll_phase40k_candidate.v" autopos=1 normal=Left rotated=Left protected=1 visible=0 font=Default order=-1
+Property name="VLPATH" value="FIXED60_PHASE40K_INTEGRATION/VERILOG/fixed60_pll_phase40k_debug_wrapper.v" autopos=1 normal=Left rotated=Left protected=1 visible=0 font=Default order=-1
+Segment x1=1800 y1=2760 x2=1680 y2=2760
+Segment x1=1800 y1=2880 x2=1680 y2=2880
+Pin name="debug_values(0:1535)" order=25 x=1800 y=2760 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Pin name="debug_values_known" order=26 x=1800 y=2880 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Property name="pinprop$25$bus" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="pinprop$25$bussize" value="1536" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="pinprop$25$busstart" value="0" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
 .EndSymbol
 .Symbol
 Attributes format=1.0 revision=8 name="gnd" description="Ground" catalog="Connections;Terminals" track=1
@@ -555,7 +572,292 @@ Property name="VALUESCRIPT" value="edit_wave_v2" autopos=1 normal=Left rotated=L
 Property name="VITYPE" value="V" autopos=0 x=-720 y=1320 align=LeftTop protected=1 visible=0 font=Default order=-1
 Property name="REF" value="V?" autopos=1 normal=Right rotated=Bottom font=Default order=1
 .EndSymbol
+.Symbol
+Attributes format=1.0 revision=8 name="fixed60_pll_debug_analog_symbol" description="Observation-only analog debug" catalog="Auto Created Symbols;Verilog-A Symbols"
+Segment x1=0 y1=0 x2=2400 y2=0
+Segment x1=0 y1=0 x2=0 y2=3480
+Segment x1=2400 y1=0 x2=2400 y2=3480
+Segment x1=0 y1=3480 x2=2400 y2=3480
+Segment x1=-120 y1=240 x2=0 y2=240
+Pin name="debug_values(0:1535)" order=1 x=-120 y=240 visible=1 xlabel=144 ylabel=0 align=LeftBase rotated=0
+Segment x1=2400 y1=240 x2=2520 y2=240
+Pin name="adc_count_analog_dbg" order=2 x=2520 y=240 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=360 x2=2520 y2=360
+Pin name="adc_analog_dbg" order=3 x=2520 y=360 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=480 x2=2520 y2=480
+Pin name="centered_adc_analog_dbg" order=4 x=2520 y=480 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=600 x2=2520 y2=600
+Pin name="sogi_va_analog_dbg" order=5 x=2520 y=600 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=720 x2=2520 y2=720
+Pin name="sogi_vb_analog_dbg" order=6 x=2520 y=720 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=840 x2=2520 y2=840
+Pin name="vq_analog_dbg" order=7 x=2520 y=840 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=960 x2=2520 y2=960
+Pin name="slow_error_analog_dbg" order=8 x=2520 y=960 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=1080 x2=2520 y2=1080
+Pin name="phase_error_analog_dbg" order=9 x=2520 y=1080 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=1200 x2=2520 y2=1200
+Pin name="pll_step_analog_dbg" order=10 x=2520 y=1200 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=1320 x2=2520 y2=1320
+Pin name="pll_freq_analog_dbg" order=11 x=2520 y=1320 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=1440 x2=2520 y2=1440
+Pin name="pll_phase_5k_analog_dbg" order=12 x=2520 y=1440 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=1560 x2=2520 y2=1560
+Pin name="pll_phase_post_5k_analog_dbg" order=13 x=2520 y=1560 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=1680 x2=2520 y2=1680
+Pin name="theta_40k_analog_dbg" order=14 x=2520 y=1680 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=1800 x2=2520 y2=1800
+Pin name="phase_step_analog_dbg" order=15 x=2520 y=1800 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=1920 x2=2520 y2=1920
+Pin name="substep_analog_dbg" order=16 x=2520 y=1920 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=2040 x2=2520 y2=2040
+Pin name="residual_analog_dbg" order=17 x=2520 y=2040 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=2160 x2=2520 y2=2160
+Pin name="correction_quotient_analog_dbg" order=18 x=2520 y=2160 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=2280 x2=2520 y2=2280
+Pin name="correction_remainder_analog_dbg" order=19 x=2520 y=2280 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=2400 x2=2520 y2=2400
+Pin name="correction_analog_dbg" order=20 x=2520 y=2400 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=2520 x2=2520 y2=2520
+Pin name="correction_remaining_analog_dbg" order=21 x=2520 y=2520 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=2640 x2=2520 y2=2640
+Pin name="detector_error_analog_dbg" order=22 x=2520 y=2640 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=2760 x2=2520 y2=2760
+Pin name="pll_error_analog_dbg" order=23 x=2520 y=2760 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=2880 x2=2520 y2=2880
+Pin name="adc_offset_analog_dbg" order=24 x=2520 y=2880 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=3000 x2=2520 y2=3000
+Pin name="held_ref_analog_dbg" order=25 x=2520 y=3000 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=3120 x2=2520 y2=3120
+Pin name="extrapolated_ref_analog_dbg" order=26 x=2520 y=3120 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Segment x1=2400 y1=3240 x2=2520 y2=3240
+Pin name="delivery_step_analog_dbg" order=27 x=2520 y=3240 visible=1 xlabel=-144 ylabel=0 align=RightBase rotated=0
+Property name="MODEL" value="U" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="REF" value="U?" autopos=1 normal=Top rotated=Right font=Default order=-1
+Property name="VALUE" value="Observation-only debug" autopos=1 normal=Top rotated=Right font=Default order=-1
+Property name="VAFILE" value="\"<schemdir>/FIXED60_PHASE40K_INTEGRATION/VERILOG/fixed60_pll_phase40k_debug_analog.va\"" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="TEMPLATE" value="<ref> <nodelist> %ref%$DBG;.LOAD <t:VAFILE>;.MODEL %ref%$DBG fixed60_pll_phase40k_debug_analog;.KEEP <node[2]> <node[3]> <node[4]> <node[5]> <node[6]> <node[7]> <node[8]> <node[9]> <node[10]> <node[11]> <node[12]> <node[13]> <node[14]> <node[15]> <node[16]> <node[17]> <node[18]> <node[19]> <node[20]> <node[21]> <node[22]> <node[23]> <node[24]> <node[25]> <node[26]> <node[27]>;.GRAPH <node[3]> curveLabel=adc_analog_dbg analysis=tran;.GRAPH <node[5]> curveLabel=sogi_va_analog_dbg analysis=tran;.GRAPH <node[6]> curveLabel=sogi_vb_analog_dbg analysis=tran;.GRAPH <node[7]> curveLabel=vq_analog_dbg analysis=tran;.GRAPH <node[8]> curveLabel=slow_error_analog_dbg analysis=tran;.GRAPH <node[9]> curveLabel=phase_error_analog_dbg analysis=tran;.GRAPH <node[11]> curveLabel=pll_freq_analog_dbg analysis=tran;.GRAPH <node[12]> curveLabel=pll_phase_5k_analog_dbg analysis=tran;.GRAPH <node[14]> curveLabel=theta_40k_analog_dbg analysis=tran" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="SIMULATOR" value="SIMETRIX" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="pinprop$1$bus" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="pinprop$1$bussize" value="1536" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="pinprop$1$busstart" value="0" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+.EndSymbol
 .EndSymbolLibrary
+.Instance
+Attributes type=symbol name="fixed60_pll_debug_analog_symbol" selected=0 protected=0 x=-2880 y=1680 orient=N0
+Property name="REF" value="U_DBG" autopos=1 normal=Top rotated=Right font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin2="adc_count_analog_dbg" pin3="adc_analog_dbg" pin4="centered_adc_analog_dbg" pin5="sogi_va_analog_dbg" pin6="sogi_vb_analog_dbg" pin7="vq_analog_dbg" pin8="slow_error_analog_dbg" pin9="phase_error_analog_dbg" pin10="pll_step_analog_dbg" pin11="pll_freq_analog_dbg" pin12="pll_phase_5k_analog_dbg" pin13="pll_phase_post_5k_analog_dbg" pin14="theta_40k_analog_dbg" pin15="phase_step_analog_dbg" pin16="substep_analog_dbg" pin17="residual_analog_dbg" pin18="correction_quotient_analog_dbg" pin19="correction_remainder_analog_dbg" pin20="correction_analog_dbg" pin21="correction_remaining_analog_dbg" pin22="detector_error_analog_dbg" pin23="pll_error_analog_dbg" pin24="adc_offset_analog_dbg" pin25="held_ref_analog_dbg" pin26="extrapolated_ref_analog_dbg" pin27="delivery_step_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=1920 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="adc_count_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="adc_count_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=2040 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="adc_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="adc_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=2160 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="centered_adc_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="centered_adc_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=2280 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="sogi_va_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="sogi_va_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=2400 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="sogi_vb_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="sogi_vb_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=2520 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="vq_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="vq_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=2640 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="slow_error_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="slow_error_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=2760 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="phase_error_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="phase_error_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=2880 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="pll_step_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="pll_step_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=3000 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="pll_freq_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="pll_freq_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=3120 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="pll_phase_5k_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="pll_phase_5k_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=3240 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="pll_phase_post_5k_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="pll_phase_post_5k_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=3360 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="theta_40k_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="theta_40k_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=3480 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="phase_step_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="phase_step_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=3600 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="substep_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="substep_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=3720 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="residual_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="residual_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=3840 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="correction_quotient_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="correction_quotient_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=3960 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="correction_remainder_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="correction_remainder_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=4080 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="correction_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="correction_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=4200 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="correction_remaining_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="correction_remaining_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=4320 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="detector_error_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="detector_error_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=4440 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="pll_error_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="pll_error_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=4560 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="adc_offset_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="adc_offset_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=4680 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="held_ref_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="held_ref_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=4800 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="extrapolated_ref_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="extrapolated_ref_analog_dbg"
+.EndInstance
+.Instance
+Attributes type=symbol name="fixed60_debug_terminal" selected=0 protected=0 x=-360 y=4920 orient=N0
+Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="VALUE" value="delivery_step_analog_dbg" autopos=1 normal=Right rotated=Bottom font=Default order=-1
+Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Netnames pin1="delivery_step_analog_dbg"
+.EndInstance
 .Instance
 Attributes type=symbol name="gnd" selected=0 protected=0 x=-7920 y=960 orient=N0 
 Property name="netname" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
@@ -1112,32 +1414,6 @@ Property name="value" value="curveLabel= U5-pll_update nowarn=true ylog=auto xlo
 Netnames pin1="U5_pll_update"
 .EndInstance
 .Instance
-Attributes type=symbol name="probe_bus" selected=0 protected=0 x=-3600 y=480 orient=N0 
-Property name="ANALOGOFFSET" value="0.5" autopos=0 x=-240 y=1560 align=LeftBase visible=0 font=Default order=-1
-Property name="ANALOGRANGE" value="1.0" autopos=0 x=-240 y=1440 align=LeftBase visible=0 font=Default order=-1
-Property name="AXISNAME" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
-Property name="AXISTYPE" value="auto" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
-Property name="BUSEND" value="0" autopos=0 x=-240 y=1078 align=LeftBase visible=0 font=Default order=-1
-Property name="BUSSTART" value="32" autopos=0 x=-240 y=958 align=LeftBase visible=0 font=Default order=-1
-Property name="BUSTYPE" value="dec" autopos=0 x=-240 y=1318 align=LeftBase visible=0 font=Default order=-1
-Property name="GRAPHNAME" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
-Property name="HIGHTHRESH" value="0.9" autopos=0 x=-240 y=1920 align=LeftTop visible=0 font=Default order=-1
-Property name="HISTORY_DEPTH" value="2" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
-Property name="HISTORY_DEPTH_DEFAULT" value="1" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
-Property name="HOLDINV" value="0" autopos=0 x=-240 y=1198 align=LeftBase visible=0 font=Default order=-1
-Property name="LABEL" value="theta_40k" autopos=1 normal=Right rotated=Right font=Default order=-1
-Property name="LOWTHRESH" value="0.8" autopos=0 x=-240 y=1800 align=LeftTop visible=0 font=Default order=-1
-Property name="pinprop$1$bus" value="" autopos=0 x=-240 y=838 align=LeftBase font=Default order=-1
-Property name="PROBE_DISABLED" value="false" autopos=0 x=-240 y=2040 align=LeftTop visible=0 font=Default order=-1
-Property name="ref" value="Probe45" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
-Property name="SEPARATE_CURVES" value="0" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
-Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
-Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
-Property name="USE_GRAPH_NAME_AS_TITLE" value="0" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
-Property name="YUNIT" value="" autopos=0 x=-240 y=1680 align=LeftBase visible=0 font=Default order=-1
-Netnames
-.EndInstance
-.Instance
 Attributes type=symbol name="probe_bus" selected=0 protected=0 x=-3600 y=600 orient=N0 
 Property name="ANALOGOFFSET" value="0.5" autopos=0 x=-240 y=1560 align=LeftBase visible=0 font=Default order=-1
 Property name="ANALOGRANGE" value="1" autopos=0 x=-240 y=1440 align=LeftBase visible=0 font=Default order=-1
@@ -1487,16 +1763,15 @@ Property name="VAOPTIONS" value="" autopos=1 normal=Left rotated=Left visible=0 
 Netnames
 .EndInstance
 .Instance
-Attributes type=symbol name="fixed60_pll_phase40k_candidate_2127009941" selected=0 protected=0 x=-5400 y=-840 orient=N0 
+Attributes type=symbol name="fixed60_pll_phase40k_debug_wrapper_symbol" selected=0 protected=0 x=-5400 y=-840 orient=N0 
 Property name="MODEL" value="U" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
-Property name="MODULENAME" value="fixed60_pll_phase40k_candidate" autopos=1 normal=Top rotated=Right font=Default order=-1
+Property name="MODULENAME" value="fixed60_pll_phase40k_debug_wrapper" autopos=1 normal=Top rotated=Right font=Default order=-1
 Property name="PARAM_VALUES" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
 Property name="REF" value="U5" autopos=1 normal=Top rotated=Right font=Default order=-1
 Property name="SIMPLIS_PARAM_VALUES" value="RIN=10e6 ROUT=10.0 TH=2.5 HYSTWD=0.1 VOL=0.0 VOH=5.0 GNDREF=N" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
 Property name="SIMPLIS_PASSTHROUGH1" value="" autopos=1 normal=Top rotated=Top visible=0 font=Default displayName=1 order=-1
 Property name="SIMPLIS_PASSTHROUGH2" value="" autopos=1 normal=Top rotated=Top visible=0 font=Default displayName=1 order=-1
-Property name="SIMPLIS_TEMPLATE" value=";X$<ref> <nodelist> <ref>_VERILOG_SUB %SIMPLIS_PASSTHROUGH1%;.SUBCKT <ref>_VERILOG_SUB  1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 265 266 267 268 269 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308 309 310 311 312 313 314 315 316 317 318 319 320 321 322 323 324 325 326 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 355 356 357 358 359 360 361 362 363 364 365 366 367 368 369 370 371 372 373 374 375 376 377 378 379 380 381 382 383 384 385 386 387 388 389 390 391 392 393 394 395 396 397 398 399 400 401 402 403 404 405 406 407 408 409 410 411 412 413 414 415 416 417 418 419 420 421 422 423 424 425 426 427 428 429 430 431 432 433 434 435 436 437 438 439 440 441 442 443 444 445 446 447 448 449 450 451 452 453 454 455 456 457 458 459 460 461 462 463 464 465 466 467 468 469 470 471 472 473 474 475 476 477 478 479 480 481 482 483 484 485 486 487 488 489 490 491 492 493 494 495 496 497 498 499 500 501 502 503 504 505 506 507 508 509 510 511 512 513 514 515 516 517 518 519 520 521 522 523 524 525 526 527 528 529 530 531 532 533 534 535 536 537 538 539 540 541 542 543 544 545 546 547 548 549 550 551 552 553 554 555 556 557 558 559 560 561 562 563 564 565 566 567 568 569 570 571 572 573 574 575 576 577 578 579 580 581 582 583 584 585 586 587 588 589 590 591 592 593 594 595 596 597 598 599 600 601 602 603 604 605 606 607 608 609 610 611 612 613 614 615 616 617 618 619 620 621 622 623 624 625 626 627 628 629 630 631 632 633 634 635 636 637 638 639 640 641 642 643 644 645 646 647 648 649 650 651 652 653 654 655 656 657 658 659 660 %SIMPLIS_PASSTHROUGH2%;!V_VERILOG [ 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128 129 130 131 132 133 134 135 136 137 138 139 140 141 142 143 144 145 146 147 148 149 150 151 152 153 154 155 156 157 158 159 160 161 162 163 164 165 166 167 168 169 170 171 172 173 174 175 176 177 178 179 180 181 182 183 184 185 186 187 188 189 190 191 192 193 194 195 196 197 198 199 200 201 202 203 204 205 206 207 208 209 210 211 212 213 214 215 216 217 218 219 220 221 222 223 224 225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240 241 242 243 244 245 246 247 248 249 250 251 252 253 254 255 256 257 258 259 260 261 262 263 264 265 266 267 268 269 270 271 272 273 274 275 276 277 278 279 280 281 282 283 284 285 286 287 288 289 290 291 292 293 294 295 296 297 298 299 300 301 302 303 304 305 306 307 308 309 310 311 312 313 314 315 316 317 318 319 320 321 322 323 324 325 326 327 328 329 330 331 332 333 334 335 336 337 338 339 340 341 342 343 344 345 346 347 348 349 350 351 352 353 354 355 356 357 358 359 360 361 362 363 364 365 366 367 368 369 370 371 372 373 374 375 376 377 378 379 380 381 382 383 384 385 386 387 388 389 390 391 392 393 394 395 396 397 398 399 400 401 402 403 404 405 406 407 408 409 410 411 412 413 414 415 416 417 418 419 420 421 422 423 424 425 426 427 428 429 430 431 432 433 434 435 436 437 438 439 440 441 442 443 444 445 446 447 448 449 450 451 452 453 454 455 456 457 458 459 460 461 462 463 464 465 466 467 468 469 470 471 472 473 474 475 476 477 478 479 480 481 482 483 484 485 486 487 488 489 490 491 492 493 494 495 496 497 498 499 500 501 502 503 504 505 506 507 508 509 510 511 512 513 514 515 516 517 518 519 520 521 522 523 524 525 526 527 528 529 530 531 532 533 534 535 536 537 538 539 540 541 542 543 544 545 546 547 548 549 550 551 552 553 554 555 556 557 558 559 560 561 562 563 564 565 566 567 568 569 570 571 572 573 574 575 576 577 578 579 580 581 582 583 584 585 586 587 588 589 590 591 592 593 594 595 596 597 598 599 600 601 602 603 604 605 606 607 608 609 610 611 612 613 614 615 616 617 618 619 620 621 622 623 624 625 626 627 628 629 630 631 632 633 634 635 636 637 638 639 640 641 642 643 644 645 646 647 648 649 650 651 652 653 654 655 656 657 658 659 660 ] [ 1 2 3 4 5 6 7 8 9 10 11 12 13 14 ] MODEL=M_VERILOG_M;.MODEL M_VERILOG_M VERILOG_HDL_MODULE MODULE=\"%MODULENAME%\";+ MODULE_SOURCE=\"%VLPATH%\";+ OUTPUT=\"phase_ok,1,locked,1,hold_60hz,1,pll_phase_5k,30,pll_phase_post_5k,30,pll_step_q,32,slow_error,32,input_valid,1,pll_update,1,theta_40k,33,base_step_40k,64,phase_error,64,correction_quotient,64,correction_remainder,64,correction_applied,64,correction_remaining,64,substep,3,held_ref,16,extrapolated_ref,16,anchor_residual,64,interval_complete,1\" INPUT=\"ac_input,12,clk,1,reset,1\";+ %SIMPLIS_PARAM_VALUES%;.ENDS <ref>_VERILOG_SUB" autopos=1 normal=Top rotated=Top visible=0 font=Default displayName=1 order=-1
-Property name="SIMULATOR" value="DUAL" autopos=1 normal=Top rotated=Top visible=0 font=Default displayName=1 order=-1
+Property name="SIMULATOR" value="SIMETRIX" autopos=1 normal=Top rotated=Top visible=0 font=Default displayName=1 order=-1
 Property name="StyleNormal" value="DefaultInstance" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
 Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
 Netnames pin2="V4_P" pin3="U5_reset" pin4="U5_phase_ok" pin5="U5_locked" pin6="U5_hold_60hz" pin11="U5_input_valid" pin12="U5_pll_update" pin24="U5_interval_complete"
@@ -2417,13 +2692,21 @@ Property name="NetName" value="NET2" autopos=1 normal=Left rotated=Left visible=
 Property name="StyleNormal" value="DefaultWire" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
 Property name="StyleSelected" value="DefaultSelected" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
 .EndWire
+Wire x1=-3600 y1=1920 x2=-3000 y2=1920 net="PLL_DEBUG_VALUES" branch=""
+.Wire
+Attributes x1=-3600 y1=1920 x2=-3000 y2=1920
+Property name="BranchFormula" value="" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="NetName" value="PLL_DEBUG_VALUES" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleNormal" value="DefaultBus" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+Property name="StyleSelected" value="DefaultSelectedBus" autopos=1 normal=Left rotated=Left visible=0 font=Default order=-1
+.EndWire
 Text value=".simulator SIMETRIX\n.tran 1\n.simulator DEFAULT\n"
-LicenseInfo version="8.30" feats=Basic|AD|Micron|Mcore2|Schematic|Styles|Advanced|Soa|Multistep|Monte|Sim|Plugindevices|Rdif|Scripts|Rtn|SIMPLIS_IF|RemoteSimplis|beta|Va|Dotload|ProModels|Binning|Hspicedotlib|Vl|VerilogHdl|Mcore1|Opt|Snapshot|Sensitivity|Vs|Vx|Dvm|SIMPLIS_Vl|Mcsp1|Mcsp2|SimplisElite|Debug serial=unknown user="unknown" code=unknown product="SIMetrix/SIMPLIS" binarch=x64 system="WINNT/10.0/x64/34308935680/6/1/6/2013580318"
+LicenseInfo version="8.30" feats=Basic|AD|Micron|Mcore2|Schematic|Styles|Advanced|Soa|Multistep|Monte|Sim|Plugindevices|Rdif|Scripts|Rtn|SIMPLIS_IF|RemoteSimplis|beta|Va|Dotload|ProModels|Binning|Hspicedotlib|Vl|VerilogHdl|Mcore1|Opt|Snapshot|Sensitivity|Vs|Vx|Dvm|SIMPLIS_Vl|Mcsp1|Mcsp2|SimplisElite|Debug serial=unknown user="unknown" code=unknown product="SIMetrix/SIMPLIS" binarch=x64 system="WINNT/10.0/x64/16820563968/8/1/16/1345700967"
 SimulatorMode value="SIMetrix"
-View x=-8741 y=-3823 zoomlevel=31 zoom=8 snapgrid=120 offsetX=8741 offsetY=2803
+View x=-8889 y=-2803 zoomlevel=31 zoom=8 snapgrid=120 offsetX=8741 offsetY=2803
 Property name="CreateProduct" value="SIMetrix/SIMPLIS Elite with DVM and Verilog for SIMPLIS" type=value
 Property name="GUID" value="{70bec829-793f-467b-807c-a3ed0d60e2f4}" type=value
-Property name="UserVersion" value="5" type=value
-Property name="WriteLog" value="5/0/65927/0" type=value
+Property name="UserVersion" value="6" type=value
+Property name="WriteLog" value="6/0/66198/0" type=value
 .EndSchematic
 .EndComponent

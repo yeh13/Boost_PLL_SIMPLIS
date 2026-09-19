@@ -1,0 +1,126 @@
+`include "disciplines.vams"
+
+module fixed60_pll_phase40k_debug_analog(
+    debug_values,
+    adc_count_analog_dbg,
+    adc_analog_dbg,
+    centered_adc_analog_dbg,
+    sogi_va_analog_dbg,
+    sogi_vb_analog_dbg,
+    vq_analog_dbg,
+    slow_error_analog_dbg,
+    phase_error_analog_dbg,
+    pll_step_analog_dbg,
+    pll_freq_analog_dbg,
+    pll_phase_5k_analog_dbg,
+    pll_phase_post_5k_analog_dbg,
+    theta_40k_analog_dbg,
+    phase_step_analog_dbg,
+    substep_analog_dbg,
+    residual_analog_dbg,
+    correction_quotient_analog_dbg,
+    correction_remainder_analog_dbg,
+    correction_analog_dbg,
+    correction_remaining_analog_dbg,
+    detector_error_analog_dbg,
+    pll_error_analog_dbg,
+    adc_offset_analog_dbg,
+    held_ref_analog_dbg,
+    extrapolated_ref_analog_dbg,
+    delivery_step_analog_dbg
+);
+    input [0:1535] debug_values;
+    electrical [0:1535] debug_values;
+    output adc_count_analog_dbg;
+    electrical adc_count_analog_dbg;
+    output adc_analog_dbg;
+    electrical adc_analog_dbg;
+    output centered_adc_analog_dbg;
+    electrical centered_adc_analog_dbg;
+    output sogi_va_analog_dbg;
+    electrical sogi_va_analog_dbg;
+    output sogi_vb_analog_dbg;
+    electrical sogi_vb_analog_dbg;
+    output vq_analog_dbg;
+    electrical vq_analog_dbg;
+    output slow_error_analog_dbg;
+    electrical slow_error_analog_dbg;
+    output phase_error_analog_dbg;
+    electrical phase_error_analog_dbg;
+    output pll_step_analog_dbg;
+    electrical pll_step_analog_dbg;
+    output pll_freq_analog_dbg;
+    electrical pll_freq_analog_dbg;
+    output pll_phase_5k_analog_dbg;
+    electrical pll_phase_5k_analog_dbg;
+    output pll_phase_post_5k_analog_dbg;
+    electrical pll_phase_post_5k_analog_dbg;
+    output theta_40k_analog_dbg;
+    electrical theta_40k_analog_dbg;
+    output phase_step_analog_dbg;
+    electrical phase_step_analog_dbg;
+    output substep_analog_dbg;
+    electrical substep_analog_dbg;
+    output residual_analog_dbg;
+    electrical residual_analog_dbg;
+    output correction_quotient_analog_dbg;
+    electrical correction_quotient_analog_dbg;
+    output correction_remainder_analog_dbg;
+    electrical correction_remainder_analog_dbg;
+    output correction_analog_dbg;
+    electrical correction_analog_dbg;
+    output correction_remaining_analog_dbg;
+    electrical correction_remaining_analog_dbg;
+    output detector_error_analog_dbg;
+    electrical detector_error_analog_dbg;
+    output pll_error_analog_dbg;
+    electrical pll_error_analog_dbg;
+    output adc_offset_analog_dbg;
+    electrical adc_offset_analog_dbg;
+    output held_ref_analog_dbg;
+    electrical held_ref_analog_dbg;
+    output extrapolated_ref_analog_dbg;
+    electrical extrapolated_ref_analog_dbg;
+    output delivery_step_analog_dbg;
+    electrical delivery_step_analog_dbg;
+    parameter real logic_threshold = 2.5;
+    real value[0:23];
+    genvar channel_index, bit_index;
+
+    analog begin
+        for (channel_index = 0; channel_index < 24; channel_index = channel_index + 1) begin
+            value[channel_index] = (V(debug_values[channel_index * 64 + 63]) > logic_threshold) ? -1.0 : 0.0;
+            for (bit_index = 62; bit_index >= 0; bit_index = bit_index - 1) begin
+                value[channel_index] = value[channel_index] * 2.0
+                    + ((V(debug_values[channel_index * 64 + bit_index]) > logic_threshold) ? 1.0 : 0.0);
+            end
+        end
+        V(adc_count_analog_dbg) <+ value[0] / 1000.0;
+        V(adc_analog_dbg) <+ (value[0] - 2048.0) / 2048.0;
+        V(centered_adc_analog_dbg) <+ value[1] / 2048.0;
+        V(sogi_va_analog_dbg) <+ value[2] / 8388608.0;
+        V(sogi_vb_analog_dbg) <+ value[3] / 8388608.0;
+        V(vq_analog_dbg) <+ value[4] / 8388608.0;
+        V(slow_error_analog_dbg) <+ value[5] / 25.0;
+        V(phase_error_analog_dbg) <+ value[6] * 1000.0 / 16777216.0;
+        V(pll_step_analog_dbg) <+ value[7] / 2097152.0;
+        V(pll_freq_analog_dbg) <+ value[7] * 5000.0 * 0.1 / 754974720.0;
+        V(pll_phase_5k_analog_dbg) <+ value[8] * 0.01 / 2097152.0;
+        V(pll_phase_post_5k_analog_dbg) <+ value[9] * 0.01 / 2097152.0;
+        V(theta_40k_analog_dbg) <+ value[10] * 0.01 / 16777216.0;
+        V(phase_step_analog_dbg) <+ value[11] / 16777216.0;
+        V(substep_analog_dbg) <+ value[12];
+        V(residual_analog_dbg) <+ value[13];
+        V(correction_quotient_analog_dbg) <+ value[14] * 1000.0 / 16777216.0;
+        V(correction_remainder_analog_dbg) <+ value[15];
+        V(correction_analog_dbg) <+ value[16] * 1000.0 / 16777216.0;
+        V(correction_remaining_analog_dbg) <+ value[17] * 1000.0 / 16777216.0;
+        V(detector_error_analog_dbg) <+ value[18] / 1000.0;
+        V(pll_error_analog_dbg) <+ value[19] / 1000.0;
+        V(adc_offset_analog_dbg) <+ value[20] / 4096000.0;
+        V(held_ref_analog_dbg) <+ value[21] / 32768.0;
+        V(extrapolated_ref_analog_dbg) <+ value[22] / 32768.0;
+        V(delivery_step_analog_dbg) <+ value[23] / 16777216.0;
+    end
+endmodule
+
