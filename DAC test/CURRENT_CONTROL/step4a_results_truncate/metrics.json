@@ -1,0 +1,191 @@
+{
+  "method": "offline observation replay; no live SIMPLIS controller instance; no ADC input parity",
+  "configuration": {
+    "quantizer": "truncate",
+    "sample_phase": 0.85,
+    "test_voltage_counts_per_volt": 10
+  },
+  "sample_rate_hz": 40000,
+  "duration_seconds": 0.12,
+  "window_seconds": [
+    0.06666666666666667,
+    0.11666666666666667
+  ],
+  "all_updates": {
+    "samples": 2000,
+    "TEST_error_counts_integer": {
+      "min": -16,
+      "max": 6,
+      "rms": 4.434692774026178
+    },
+    "e": {
+      "min": -16,
+      "max": 6,
+      "rms": 4.311380289420083
+    },
+    "raw": {
+      "min": -129,
+      "max": 4,
+      "rms": 51.11632322458257
+    },
+    "limited": {
+      "min": -129,
+      "max": 4,
+      "rms": 51.11632322458257
+    },
+    "effective_correction": {
+      "min": -128,
+      "max": 4,
+      "rms": 50.955961378429514
+    },
+    "x1": {
+      "min": -7,
+      "max": 6,
+      "rms": 2.3616731357239087
+    },
+    "x2": {
+      "min": -7,
+      "max": 6,
+      "rms": 2.348616614094348
+    },
+    "y1": {
+      "min": -128,
+      "max": 4,
+      "rms": 50.955961378429514
+    },
+    "y2": {
+      "min": -128,
+      "max": 4,
+      "rms": 50.805885485837166
+    },
+    "deadband_hit_percent": 43.55,
+    "correction_saturation_flag_percent": 0.0,
+    "finalDuty_high_clamp_flag_percent": 0.0,
+    "finalDuty_low_clamp_flag_percent": 0.15,
+    "y1_differs_from_limited_samples": 3
+  },
+  "boost_updates": {
+    "samples": 1584,
+    "TEST_error_counts_integer": {
+      "min": -7,
+      "max": 6,
+      "rms": 2.8709622502610936
+    },
+    "e": {
+      "min": -7,
+      "max": 6,
+      "rms": 2.653732838813655
+    },
+    "raw": {
+      "min": -129,
+      "max": 4,
+      "rms": 57.43769681273366
+    },
+    "limited": {
+      "min": -129,
+      "max": 4,
+      "rms": 57.43769681273366
+    },
+    "effective_correction": {
+      "min": -128,
+      "max": 4,
+      "rms": 57.25750358836576
+    },
+    "x1": {
+      "min": -7,
+      "max": 6,
+      "rms": 2.653732838813655
+    },
+    "x2": {
+      "min": -7,
+      "max": 6,
+      "rms": 2.6390616636688247
+    },
+    "y1": {
+      "min": -128,
+      "max": 4,
+      "rms": 57.25750358836576
+    },
+    "y2": {
+      "min": -128,
+      "max": 4,
+      "rms": 57.088868344791074
+    },
+    "deadband_hit_percent": 47.66414141414141,
+    "correction_saturation_flag_percent": 0.0,
+    "finalDuty_high_clamp_flag_percent": 0.0,
+    "finalDuty_low_clamp_flag_percent": 0.1893939393939394,
+    "y1_differs_from_limited_samples": 3
+  },
+  "parity_mismatches": 0,
+  "replay_samples_compared": 4800,
+  "stress_samples_compared": 10209,
+  "stress_clamp_coverage": {
+    "correction_saturation_flag": 7486,
+    "finalDuty_high_clamp_flag": 3977,
+    "finalDuty_low_clamp_flag": 120
+  },
+  "boost_to_buck_clears_verified": 14,
+  "zero_state_boost_entries_verified": 15,
+  "all_buck_states_zero": true,
+  "full_run": {
+    "samples": 4800,
+    "TEST_error_counts_integer": {
+      "min": -44,
+      "max": 21,
+      "rms": 4.721537532061634
+    },
+    "e": {
+      "min": -44,
+      "max": 21,
+      "rms": 4.606811080707926
+    },
+    "raw": {
+      "min": -129,
+      "max": 4,
+      "rms": 49.65580488053067
+    },
+    "limited": {
+      "min": -129,
+      "max": 4,
+      "rms": 49.65580488053067
+    },
+    "effective_correction": {
+      "min": -128,
+      "max": 4,
+      "rms": 49.5053006421198
+    },
+    "x1": {
+      "min": -7,
+      "max": 8,
+      "rms": 2.514126753633025
+    },
+    "x2": {
+      "min": -7,
+      "max": 8,
+      "rms": 2.5022073588467175
+    },
+    "y1": {
+      "min": -128,
+      "max": 4,
+      "rms": 49.5053006421198
+    },
+    "y2": {
+      "min": -128,
+      "max": 4,
+      "rms": 49.372535803487615
+    },
+    "deadband_hit_percent": 43.833333333333336,
+    "correction_saturation_flag_percent": 0.0,
+    "finalDuty_high_clamp_flag_percent": 0.0,
+    "finalDuty_low_clamp_flag_percent": 0.14583333333333334,
+    "y1_differs_from_limited_samples": 7
+  },
+  "hashes": {
+    "Boost_I_loop_inverter.X\\mcc_generated_files\\adc1.c": "d51a6f9652382b3538d77fde841034193f60a9cc0bbd7f4a872f408d072998bf",
+    "Boost_I_loop_inverter.X\\mcc_generated_files\\pwm.c": "794a84fdd4ad22690855056f8a77c757964c5a3d8d14671c65b9b274eac8ada0",
+    "DAC test\\CURRENT_CONTROL\\Bidirection High Gain Inverter_Current_Control.sxsch": "23c1708af6a6acd5b25d24b72d85e81aad96e98936be95b1872494482ed1ecaa",
+    "DAC test\\CURRENT_CONTROL\\phase2a_step3_waveforms.txt": "5a23a356bfea2b49a3d5b8c38de174b82d16b58db2c2e4575ca7e45c641e2991",
+    "DAC test\\CURRENT_CONTROL\\phase2a_step4a_mode.txt": "42f03b98d1c98691d64de48ef5bc39d7ca7b29984021f090419efa551b26a698"
+  }
+}

@@ -1,0 +1,3 @@
+Cd "F:/BoostPLLSIMPLIS/DAC test/CURRENT_CONTROL"
+OpenSchem "F:/BoostPLLSIMPLIS/DAC test/CURRENT_CONTROL/Bidirection High Gain Inverter_Current_Control.sxsch"
+simplis_run

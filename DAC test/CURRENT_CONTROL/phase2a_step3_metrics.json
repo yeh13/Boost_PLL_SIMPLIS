@@ -1,0 +1,68 @@
+{
+  "window_seconds": [
+    0.06666666666666667,
+    0.11666666666666667
+  ],
+  "cycles": 3,
+  "samples_per_vector": 792209,
+  "CURRENT_COUNTS_PER_AMP": 570.9575757575758,
+  "metrics": {
+    "sense_delta_V": {
+      "rms": 0.5173502567600912,
+      "peak_abs": 0.733975701666,
+      "minimum": -0.7330916429,
+      "maximum": 0.733975701666
+    },
+    "error_counts": {
+      "rms": 4.521056018625088,
+      "peak_abs": 16.5875679814,
+      "minimum": -16.5875679814,
+      "maximum": 14.70067820689
+    },
+    "error_A": {
+      "rms": 0.007918374692949714,
+      "peak_abs": 0.02905219002,
+      "minimum": -0.02905219002,
+      "maximum": 0.025747408969
+    },
+    "Iout_A": {
+      "rms": 1.1246744712175838,
+      "peak_abs": 1.595599351447,
+      "minimum": -1.59367748456,
+      "maximum": 1.595599351447
+    },
+    "Iref_A": {
+      "rms": 1.122448976410652,
+      "peak_abs": 1.587382570011,
+      "minimum": -1.58738257001,
+      "maximum": 1.587382570011
+    }
+  },
+  "max_error_identity_residual_A": 1.0000222872008635e-11,
+  "max_scaling_identity_residual_counts": 2.8952715780405924e-09,
+  "positive_reference_nonpositive_output_samples": 266,
+  "opposite_sign_samples": 718,
+  "opposite_sign_max_abs_reference_A": 0.02573132561,
+  "opposite_sign_max_abs_output_A": 0.026246933396,
+  "opposite_sign_time_bounds_s": [
+    0.066675015,
+    0.116666581409
+  ],
+  "incorrect_error_sign_samples_tolerance_1nA": 0,
+  "polarity_samples_evaluated": 330221,
+  "opposite_sign_samples_outside_30mA_reference_band": 0,
+  "positive_peak_sample": {
+    "sense_delta_V": 0.733865253507,
+    "error_counts": -4.55434401628,
+    "error_A": -0.00797667674,
+    "Iout_A": 1.595359246754,
+    "Iref_A": 1.587382570011
+  },
+  "negative_peak_sample": {
+    "sense_delta_V": -0.7316745154,
+    "error_counts": 1.835173323309,
+    "error_A": 0.003214202598,
+    "Iout_A": -1.59059677261,
+    "Iref_A": -1.58738257001
+  }
+}

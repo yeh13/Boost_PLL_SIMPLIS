@@ -1,0 +1,3 @@
+Set precision=15
+SetGroup simplis_tran1
+Show /file "F:/BoostPLLSIMPLIS/DAC test/CURRENT_CONTROL/phase2a_step4a_mode.txt" /noindex /plain Vec('247')

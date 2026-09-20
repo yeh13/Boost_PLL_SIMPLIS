@@ -1,0 +1,3 @@
+Set precision=15
+SetGroup simplis_tran1
+Show /file "F:/BoostPLLSIMPLIS/DAC test/CURRENT_CONTROL/phase2a_step3_waveforms.txt" /noindex /plain time, Vec('275'), Vec('273'), Vec('277'), Vec('278'), Vec('276')

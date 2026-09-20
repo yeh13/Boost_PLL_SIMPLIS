@@ -1,0 +1,2 @@
+Show /file "F:/BoostPLLSIMPLIS/DAC test/CURRENT_CONTROL/phase2a_step3_status.txt" Groups()
+Show /file "F:/BoostPLLSIMPLIS/DAC test/CURRENT_CONTROL/phase2a_step3_vectors.txt" VectorsInGroup('simplis_tran1')
