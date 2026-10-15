@@ -1,0 +1,66 @@
+{
+  "status": "PASS",
+  "source_unchanged": true,
+  "frozen_sources_byte_identical": true,
+  "changed_files": [
+    "mcc_generated_files/voltage_sogi_sync.c",
+    "nbproject/Makefile-default.mk",
+    "nbproject/Makefile-genesis.properties",
+    "nbproject/Makefile-impl.mk",
+    "nbproject/Makefile-variables.mk",
+    "nbproject/Package-default.bash",
+    "nbproject/project.xml"
+  ],
+  "fixed_sogi_lut_index": 50,
+  "closed_loop_nco": true,
+  "single_original_i_increment": true,
+  "configured_rates_hz": {
+    "AN0": 40000,
+    "AN1": 5000,
+    "PG1": 40000,
+    "PG2": 40000,
+    "measured": false
+  },
+  "parity": {
+    "seconds": 30,
+    "samples": 150000,
+    "fields": [
+      "grid_offset_q",
+      "grid_offset",
+      "sogi_va",
+      "sogi_vb",
+      "sogi_va_n1",
+      "sogi_va_n2",
+      "sogi_vb_n1",
+      "sogi_vb_n2",
+      "sogi_vin_n1",
+      "sogi_vin_n2",
+      "pll_idx",
+      "theta_acc_q",
+      "pll_step_q",
+      "pll_int_acc",
+      "pll_err_lpf",
+      "pll_err_slow_lpf_q8",
+      "pll_err_slow_lpf",
+      "pll_lock_count",
+      "pll_unlock_count",
+      "pll_phase_ok_count",
+      "pll_phase_bad_count",
+      "pll_locked",
+      "dbg_pll_phase_ok",
+      "dbg_an1_input_valid"
+    ],
+    "comparisons_per_pair": 3600000,
+    "mismatches": 0,
+    "candidate_O0_O2_and_offline_E": true,
+    "trace_sha256": "afd7e6de3f5a80e50e7e8453ffd8802ff453a8c398ef6a9abc0c5e15d5757aed",
+    "independent_Python_PI_cases": 100025,
+    "scope": "Host C extraction/full-state parity + Python integer PI oracle; NOT target runtime bit-exact proof"
+  },
+  "codegen": {
+    "total_divdi3_relocations": 1,
+    "new_PI_divdi3": 0,
+    "retained_normalize_fallback": true
+  },
+  "pi_max_intermediate_bound": 121677012882216
+}

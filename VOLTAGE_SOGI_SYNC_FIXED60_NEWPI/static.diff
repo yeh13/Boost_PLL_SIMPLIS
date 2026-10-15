@@ -1,0 +1,193 @@
+--- baseline/mcc_generated_files/voltage_sogi_sync.c
++++ candidate/mcc_generated_files/voltage_sogi_sync.c
+@@ -1,5 +1,5 @@
+ /* Extracted only from BITEXACT_FAST active AN1 core; no power-control code.
+- * See extraction.diff and audit.json. Numeric order/coefficients unchanged.
++ * Fixed60/new-PI isolated candidate; see parent REPORT.md and static.diff.
+  * PLL step and angle geometry: degree Q21, NOT Q12 phase.
+  */
+ #include "voltage_sogi_sync.h"
+@@ -376,21 +376,37 @@
+     return (uint16_t)idx_tmp;
+ }
+ 
+-static void SOGI_LoadCoeffFromStepQ(int32_t step_q)
+-{
+-    int16_t freq_x10 = PLL_StepToFreqX10(step_q);
+-    uint16_t index;
+-    dbg_sogi_freq_x10 = freq_x10;
+-    if (freq_x10 < 550) freq_x10 = 550;
+-    else if (freq_x10 > 650) freq_x10 = 650;
+-    index = (uint16_t)(freq_x10 - 550);
+-    sogi_a1_q30 = sogi_coeff_lut[index][0];
+-    sogi_a2_q30 = sogi_coeff_lut[index][1];
+-    sogi_b0_q30 = sogi_coeff_lut[index][2];
+-    sogi_qb0_q30 = sogi_coeff_lut[index][3];
+-    sogi_qb1_q30 = sogi_coeff_lut[index][4];
++/* Fixed existing 60.0 Hz row: (600 - 550) = 50. No frequency mapping. */
++#define SOGI_FIXED60_LUT_INDEX 50U
++static void SOGI_LoadCoeffFixed60(void)
++{
++    dbg_sogi_freq_x10 = 600;
++    sogi_a1_q30 = sogi_coeff_lut[SOGI_FIXED60_LUT_INDEX][0];
++    sogi_a2_q30 = sogi_coeff_lut[SOGI_FIXED60_LUT_INDEX][1];
++    sogi_b0_q30 = sogi_coeff_lut[SOGI_FIXED60_LUT_INDEX][2];
++    sogi_qb0_q30 = sogi_coeff_lut[SOGI_FIXED60_LUT_INDEX][3];
++    sogi_qb1_q30 = sogi_coeff_lut[SOGI_FIXED60_LUT_INDEX][4];
+     sogi_qb2_q30 = sogi_qb0_q30;
+ }
++
++/* e=error/1000; S=sum(error); Ts=1/5000.
++ * delta_step=(30*e + 300*Ts*S/1000)*(180/pi)*2^21/5000.
++ * Q24 gains: round(720.9477515845177*2^24),
++ *            round(1.4418955031690353*2^24).
++ * Keep original S accumulator/clamp. Truncate combined result toward zero,
++ * exactly matching offline E; explicit shifts avoid runtime 64-bit division.
++ */
++#define PLL_NEW_KP_STEP_Q24 12095496153LL
++#define PLL_NEW_KI_STEP_Q24 24190992LL
++static int32_t PLL_NewPIToStep(int32_t error, int32_t sum)
++{
++    int64_t value = (int64_t)error * PLL_NEW_KP_STEP_Q24 +
++                    (int64_t)sum * PLL_NEW_KI_STEP_Q24;
++    if (value >= 0)
++        return (int32_t)(value >> 24);
++    return -(int32_t)((-value) >> 24);
++}
++
+ 
+ void VoltageSogiSync_Update(uint16_t adcVal)
+ {
+@@ -514,7 +530,7 @@
+         return;
+     }
+ 
+-    SOGI_LoadCoeffFromStepQ(pll_step_q);
++    SOGI_LoadCoeffFixed60();
+ 
+     v_in_q = v_in_count * (1L << SOGI_STATE_Q);
+ 
+@@ -660,16 +676,7 @@
+     else if (pll_int_acc < -PLL_INT_LIMIT)
+         pll_int_acc = -PLL_INT_LIMIT;
+ 
+-    if ((pll_locked == 0) && (abs_err_lpf > PLL_LOCK_ERR_TH))
+-    {
+-        w_delta_q = PLL_Shift64((int64_t)pll_err_pi * PLL_STEP_SCALE, PLL_KP_SHIFT_FAST) +
+-                    PLL_Shift64((int64_t)pll_int_acc * PLL_STEP_SCALE, PLL_KI_SHIFT_FAST);
+-    }
+-    else
+-    {
+-        w_delta_q = PLL_Shift64((int64_t)pll_err_pi * PLL_STEP_SCALE, PLL_KP_SHIFT_LOCK) +
+-                    PLL_Shift64((int64_t)pll_int_acc * PLL_STEP_SCALE, PLL_KI_SHIFT_LOCK);
+-    }
++    w_delta_q = PLL_NewPIToStep(pll_err_pi, pll_int_acc);
+ 
+     if (w_delta_q > PLL_TRIM_LIMIT_Q)
+         w_delta_q = PLL_TRIM_LIMIT_Q;
+--- baseline/nbproject/Makefile-default.mk
++++ candidate/nbproject/Makefile-default.mk
+@@ -30,12 +30,12 @@
+ IMAGE_TYPE=debug
+ OUTPUT_SUFFIX=elf
+ DEBUGGABLE_SUFFIX=elf
+-FINAL_IMAGE=${DISTDIR}/VOLTAGE_SOGI_SYNC_TEST.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
++FINAL_IMAGE=${DISTDIR}/VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+ else
+ IMAGE_TYPE=production
+ OUTPUT_SUFFIX=hex
+ DEBUGGABLE_SUFFIX=elf
+-FINAL_IMAGE=${DISTDIR}/VOLTAGE_SOGI_SYNC_TEST.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
++FINAL_IMAGE=${DISTDIR}/VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+ endif
+ 
+ ifeq ($(COMPARE_BUILD), true)
+@@ -82,7 +82,7 @@
+ ifneq ($(INFORMATION_MESSAGE), )
+ 	@echo $(INFORMATION_MESSAGE)
+ endif
+-	${MAKE}  -f nbproject/Makefile-default.mk ${DISTDIR}/VOLTAGE_SOGI_SYNC_TEST.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
++	${MAKE}  -f nbproject/Makefile-default.mk ${DISTDIR}/VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+ 
+ MP_PROCESSOR_OPTION=33CK256MP506
+ MP_LINKER_FILE_OPTION=,--script=p33CK256MP506.gld
+@@ -239,15 +239,15 @@
+ # ------------------------------------------------------------------------------------
+ # Rules for buildStep: link
+ ifeq ($(TYPE_IMAGE), DEBUG_RUN)
+-${DISTDIR}/VOLTAGE_SOGI_SYNC_TEST.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    
++${DISTDIR}/VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    
+ 	@${MKDIR} ${DISTDIR} 
+-	${MP_CC} $(MP_EXTRA_LD_PRE)  -o ${DISTDIR}/VOLTAGE_SOGI_SYNC_TEST.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}      -mcpu=$(MP_PROCESSOR_OPTION)        -D__DEBUG=__DEBUG -D__MPLAB_DEBUGGER_SNAP=1  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)   -mreserve=data@0x1000:0x101B -mreserve=data@0x101C:0x101D -mreserve=data@0x101E:0x101F -mreserve=data@0x1020:0x1021 -mreserve=data@0x1022:0x1023 -mreserve=data@0x1024:0x1027 -mreserve=data@0x1028:0x104F   -Wl,--local-stack,,--defsym=__MPLAB_BUILD=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,-D__DEBUG=__DEBUG,--defsym=__MPLAB_DEBUGGER_SNAP=1,$(MP_LINKER_FILE_OPTION),--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--no-force-link,--smart-io,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--report-mem,--memorysummary,${DISTDIR}/memoryfile.xml$(MP_EXTRA_LD_POST)  
+-	
+-else
+-${DISTDIR}/VOLTAGE_SOGI_SYNC_TEST.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   
++	${MP_CC} $(MP_EXTRA_LD_PRE)  -o ${DISTDIR}/VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}      -mcpu=$(MP_PROCESSOR_OPTION)        -D__DEBUG=__DEBUG -D__MPLAB_DEBUGGER_SNAP=1  -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)   -mreserve=data@0x1000:0x101B -mreserve=data@0x101C:0x101D -mreserve=data@0x101E:0x101F -mreserve=data@0x1020:0x1021 -mreserve=data@0x1022:0x1023 -mreserve=data@0x1024:0x1027 -mreserve=data@0x1028:0x104F   -Wl,--local-stack,,--defsym=__MPLAB_BUILD=1,--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,-D__DEBUG=__DEBUG,--defsym=__MPLAB_DEBUGGER_SNAP=1,$(MP_LINKER_FILE_OPTION),--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--no-force-link,--smart-io,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--report-mem,--memorysummary,${DISTDIR}/memoryfile.xml$(MP_EXTRA_LD_POST)  
++	
++else
++${DISTDIR}/VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   
+ 	@${MKDIR} ${DISTDIR} 
+-	${MP_CC} $(MP_EXTRA_LD_PRE)  -o ${DISTDIR}/VOLTAGE_SOGI_SYNC_TEST.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}      -mcpu=$(MP_PROCESSOR_OPTION)        -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -Wl,--local-stack,,--defsym=__MPLAB_BUILD=1,$(MP_LINKER_FILE_OPTION),--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--no-force-link,--smart-io,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--report-mem,--memorysummary,${DISTDIR}/memoryfile.xml$(MP_EXTRA_LD_POST)  
+-	${MP_CC_DIR}\\xc16-bin2hex ${DISTDIR}/VOLTAGE_SOGI_SYNC_TEST.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} -a  -omf=elf   
++	${MP_CC} $(MP_EXTRA_LD_PRE)  -o ${DISTDIR}/VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX}  ${OBJECTFILES_QUOTED_IF_SPACED}      -mcpu=$(MP_PROCESSOR_OPTION)        -omf=elf -DXPRJ_default=$(CND_CONF)    $(COMPARISON_BUILD)  -Wl,--local-stack,,--defsym=__MPLAB_BUILD=1,$(MP_LINKER_FILE_OPTION),--stack=16,--check-sections,--data-init,--pack-data,--handles,--isr,--no-gc-sections,--fill-upper=0,--stackguard=16,--no-force-link,--smart-io,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--report-mem,--memorysummary,${DISTDIR}/memoryfile.xml$(MP_EXTRA_LD_POST)  
++	${MP_CC_DIR}\\xc16-bin2hex ${DISTDIR}/VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} -a  -omf=elf   
+ 	
+ endif
+ 
+--- baseline/nbproject/Makefile-genesis.properties
++++ candidate/nbproject/Makefile-genesis.properties
+@@ -8,6 +8,6 @@
+ configurations-xml=dc892c011835be7cb6f5eaa54ffef825
+ default.com-microchip-mplab-mdbcore-snap-SnapToolImpl.md5=d768e3937e22863b0fa1d6d0f2b04444
+ com-microchip-mplab-nbide-embedded-makeproject-MakeProject.md5=a9153dec522c5f735373b47d34f674e3
+-proj.dir=F\:\\BoostPLLSIMPLIS\\VOLTAGE_SOGI_SYNC_TEST\\VOLTAGE_SOGI_SYNC_TEST.X
++proj.dir=F\:\\BoostPLLSIMPLIS\\VOLTAGE_SOGI_SYNC_FIXED60_NEWPI\\VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X
+ host.platform=windows
+ default.com-microchip-mplab-nbide-toolchain-xc16-XC16LanguageToolchain.md5=891eb3d344abd677029f4e174e2b72f6
+--- baseline/nbproject/Makefile-impl.mk
++++ candidate/nbproject/Makefile-impl.mk
+@@ -24,7 +24,7 @@
+ 
+ 
+ # Project Name
+-PROJECTNAME=VOLTAGE_SOGI_SYNC_TEST.X
++PROJECTNAME=VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X
+ 
+ # Active Configuration
+ DEFAULTCONF=default
+--- baseline/nbproject/Makefile-variables.mk
++++ candidate/nbproject/Makefile-variables.mk
+@@ -6,5 +6,5 @@
+ CND_BASEDIR=`pwd`
+ # default configuration
+ CND_ARTIFACT_DIR_default=dist/default/production
+-CND_ARTIFACT_NAME_default=VOLTAGE_SOGI_SYNC_TEST.X.production.hex
+-CND_ARTIFACT_PATH_default=dist/default/production/VOLTAGE_SOGI_SYNC_TEST.X.production.hex
++CND_ARTIFACT_NAME_default=VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X.production.hex
++CND_ARTIFACT_PATH_default=dist/default/production/VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X.production.hex
+--- baseline/nbproject/Package-default.bash
++++ candidate/nbproject/Package-default.bash
+@@ -10,8 +10,8 @@
+ CND_DISTDIR=dist
+ TMPDIR=build/${CND_CONF}/${IMAGE_TYPE}/tmp-packaging
+ TMPDIRNAME=tmp-packaging
+-OUTPUT_PATH=dist/${CND_CONF}/${IMAGE_TYPE}/closed_loop_inverter.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+-OUTPUT_BASENAME=closed_loop_inverter.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
++OUTPUT_PATH=dist/${CND_CONF}/${IMAGE_TYPE}/VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
++OUTPUT_BASENAME=VOLTAGE_SOGI_SYNC_FIXED60_NEWPI.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+ PACKAGE_TOP_DIR=closedloopinverter.x/
+ 
+ # Functions
+--- baseline/nbproject/project.xml
++++ candidate/nbproject/project.xml
+@@ -3,8 +3,8 @@
+     <type>com.microchip.mplab.nbide.embedded.makeproject</type>
+     <configuration>
+         <data xmlns="http://www.netbeans.org/ns/make-project/1">
+-            <name>closed_loop_inverter</name>
+-            <name>closed_loop_inverter</name>
++            <name>VOLTAGE_SOGI_SYNC_FIXED60_NEWPI</name>
++            <name>VOLTAGE_SOGI_SYNC_FIXED60_NEWPI</name>
+             <creation-uuid>b5622f96-97bf-4129-9ecd-d9a3d736f395</creation-uuid>
+             <make-project-type>0</make-project-type>
+             <c-extensions>c</c-extensions>
